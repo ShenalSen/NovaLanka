@@ -1,0 +1,396 @@
+openapi: 3.0.1
+info:
+  title: policy-lifecycle-api
+  description: API Definition of policy-lifecycle-api
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8290/policy-lifecycle/v1'
+  - url: 'https://localhost:8253/policy-lifecycle/v1'
+security:
+  - default: []
+paths:
+  /purchase:
+    post:
+      summary: Purchase a policy from a valid quote
+      description: >
+        Fetches the authoritative quote, computes policy dates, creates the policy
+        in Inactive state, records the payment, and activates the policy if payment
+        succeeds. The quote must be in Draft status and not yet expired.
+      requestBody:
+        description: Purchase request — quote reference plus applicant and payment details.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
+        required: true
+      responses:
+        '200':
+          description: Policy purchased and activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseResponse'
+        '400':
+          description: Missing required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '402':
+          description: Payment failed — policy remains inactive.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Payment was not successful. Policy remains inactive.
+                  policy_id:
+                    type: string
+                  payment_id:
+                    type: string
+                  payment_status:
+                    type: string
+        '404':
+          description: Quote not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Quote not found or unavailable.
+                quote_id: QT_20240130120000123
+        '409':
+          description: Quote already used (status is not Draft).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Quote is not available for purchase.
+                quote_id: QT_20240130120000123
+                status: Bought
+        '410':
+          description: Quote has expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Quote has expired.
+                quote_id: QT_20240130120000123
+                valid_until: '2024-01-23T12:00:00'
+        '500':
+          description: Internal server error during policy lifecycle processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /policy/{policy_id}/renew:
+    post:
+      summary: Renew an existing active policy
+      description: >
+        Processes a policy renewal by calling the payments API, extending the
+        policy end_date by the requested term years, and returning the updated
+        policy details. The policy must be Active and linked to a registered customer.
+      parameters:
+        - name: policy_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the policy to renew (e.g. POL_007)
+          example: POL_007
+      requestBody:
+        description: Renewal request — term years and payment details.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewRequest'
+        required: true
+      responses:
+        '200':
+          description: Policy renewed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenewResponse'
+        '402':
+          description: Payment failed — policy renewal aborted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Payment was not successful. Policy renewal aborted.
+                  policy_id:
+                    type: string
+                  payment_id:
+                    type: string
+                  payment_status:
+                    type: string
+        '404':
+          description: Policy not found, not Active, or not linked to a registered customer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Policy not eligible for renewal
+                policy_id: POL_007
+                reason: Policy must be Active and linked to a registered customer
+        '500':
+          description: Internal server error during renewal processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  schemas:
+    PurchaseRequest:
+      type: object
+      required:
+        - quote_id
+        - personal_details
+        - payment_method
+      properties:
+        quote_id:
+          type: string
+          description: ID of a valid Draft quote
+          example: QT_20240130120000123
+        personal_details:
+          type: object
+          required:
+            - first_name
+            - last_name
+            - nic_number
+            - email
+            - mobile_number
+            - address
+          properties:
+            first_name:
+              type: string
+              example: John
+            last_name:
+              type: string
+              example: Doe
+            nic_number:
+              type: string
+              example: 199012345678
+            email:
+              type: string
+              format: email
+              example: john.doe@example.com
+            mobile_number:
+              type: string
+              example: '+94771234567'
+            address:
+              type: string
+              example: 42 Main Street, Colombo 03
+        payment_method:
+          type: string
+          enum:
+            - Cash
+            - Card
+            - Bank Transfer
+            - Online
+          example: Card
+    PurchaseResponse:
+      type: object
+      properties:
+        policy_id:
+          type: string
+          description: Newly created and activated policy ID.
+          example: POL_20240130001
+        policy_status:
+          type: string
+          example: Active
+        payment_id:
+          type: string
+          example: PAY_001
+        next_due_date:
+          type: string
+          format: date
+          description: Date the next premium payment is due,
+          example: '2024-02-28'
+        payment_time:
+          type: string
+          format: date
+          description: Transaction date recorded for the payment.
+          example: '2024-01-30'
+        payment_status:
+          type: string
+          example: success
+    RenewRequest:
+      type: object
+      required:
+        - term_years
+        - payment_details
+      properties:
+        term_years:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Number of years to extend the policy
+          example: 1
+        payment_details:
+          type: object
+          required:
+            - first_name
+            - last_name
+            - nic_number
+            - email
+            - mobile_number
+            - address
+            - payment_method
+          properties:
+            first_name:
+              type: string
+              example: Emily
+            last_name:
+              type: string
+              example: Brown
+            nic_number:
+              type: string
+              example: 900000002V
+            email:
+              type: string
+              format: email
+              example: emily@example.com
+            mobile_number:
+              type: string
+              example: '+94775678901'
+            address:
+              type: string
+              example: 456 Elm St, Kandy
+            payment_method:
+              type: string
+              enum:
+                - Cash
+                - Card
+                - Bank Transfer
+                - Online
+              example: Card
+    RenewResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Policy renewed successfully
+        policy_id:
+          type: string
+          example: POL_007
+        customer_id:
+          type: string
+          example: C_002
+        product_id:
+          type: string
+          example: P_004
+        status:
+          type: string
+          example: Active
+        start_date:
+          type: string
+          format: date
+          example: '2024-04-01'
+        new_end_date:
+          type: string
+          format: date
+          description: Extended end date after renewal
+          example: '2028-04-01'
+        premium_amount:
+          type: number
+          example: 3500.00
+        term_years_added:
+          type: integer
+          example: 1
+        payment_id:
+          type: string
+          example: PAY000011
+        policy_details:
+          type: string
+          example: Travel emergency cover
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+        code:
+          type: string
+          description: Internal error code (present on 500)
+        quote_id:
+          type: string
+          description: Echo of the quote_id (present on quote-related errors)
+        status:
+          type: string
+          description: Current quote status (present on 409)
+        valid_until:
+          type: string
+          description: Quote expiry (present on 410)
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://test.com'
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:8290/policy-lifecycle/v1'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:8290/policy-lifecycle/v1'
+  type: http
+x-wso2-basePath: /policy-lifecycle-api/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

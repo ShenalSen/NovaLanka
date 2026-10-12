@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="FetchQuoteSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Build the quote API path -->
+    <variable name="quotePath" type="STRING" expression="${'/quotes-api/1.0.0/quote/' + vars.quoteId}"/>
+    <log category="INFO">
+        <message>Fetching quote from backend for quote_id: ${vars.quoteId}</message>
+    </log>
+    <!-- GET authoritative quote data from Quotes API -->
+    <http.get configKey="ApiGateway">
+        <relativePath>${vars.quotePath}</relativePath>
+        <headers>[{"accept":"application/json"}]</headers>
+        <forceScAccepted>false</forceScAccepted>
+        <disableChunking>false</disableChunking>
+        <forceHttp10>false</forceHttp10>
+        <noKeepAlive>false</noKeepAlive>
+        <responseVariable>quoteResponse</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </http.get>
+    <!-- Stop early if quote not found -->
+    <filter xpath="${vars.quoteResponse.attributes.statusCode != 200}">
+        <then>
+            <log category="ERROR">
+                <message>Quote lookup failed. Status: ${vars.quoteResponse.attributes.statusCode}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Quote not found or unavailable.", "quote_id": "${vars.quoteId}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="404" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO">
+                <message>Quote found for quote_id: ${vars.quoteId}</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Extract authoritative values from the quote response -->
+    <variable name="productId"    type="STRING"  expression="${vars.quoteResponse.payload.product_id}"/>
+    <variable name="totalPremium" type="DOUBLE"  expression="${vars.quoteResponse.payload.total_premium}"/>
+    <variable name="termYears"    type="INTEGER" expression="${vars.quoteResponse.payload.term_years}"/>
+    <variable name="frequency"    type="STRING"  expression="${vars.quoteResponse.payload.frequency}"/>
+    <variable name="coverageType" type="STRING"  expression="${vars.quoteResponse.payload.coverage_type}"/>
+    <variable name="quoteStatus"  type="STRING"  expression="${vars.quoteResponse.payload.status}"/>
+    <variable name="validUntil"   type="STRING"  expression="${vars.quoteResponse.payload.valid_until}"/>
+
+    <!-- Reject if quote is not in Draft state (e.g. already Bought or Cancelled) -->
+    <filter xpath="${vars.quoteStatus != 'Draft'}">
+        <then>
+            <log category="WARN">
+                <message>Quote ${vars.quoteId} is not purchasable. Status: ${vars.quoteStatus}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Quote is not available for purchase.", "quote_id": "${vars.quoteId}", "status": "${vars.quoteStatus}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="409" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </then>
+        <else/>
+    </filter>
+
+    <!-- Reject if quote has expired -->
+    <filter xpath="${integer(replace(subString(vars.validUntil, 0, 10), '-', '')) &lt; integer(replace(formatDateTime(now(), 'yyyy-MM-dd'), '-', ''))}">
+        <then>
+            <log category="WARN">
+                <message>Quote ${vars.quoteId} has expired. valid_until: ${vars.validUntil}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Quote has expired.", "quote_id": "${vars.quoteId}", "valid_until": "${vars.validUntil}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="410" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </then>
+        <else/>
+    </filter>
+</sequence>

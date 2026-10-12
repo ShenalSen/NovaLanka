@@ -1,0 +1,10 @@
+---
+key: "PlaygroundAPI-1.0.0"
+name : "PlaygroundAPI"
+displayName : "PlaygroundAPI"
+description: "PlaygroundAPI"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/playground"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

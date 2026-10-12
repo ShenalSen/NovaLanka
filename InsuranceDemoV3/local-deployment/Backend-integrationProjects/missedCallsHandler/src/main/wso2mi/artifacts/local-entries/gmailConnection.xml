@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="gmailConnection" xmlns="http://ws.apache.org/ns/synapse">
+  <email.init>
+    <connectionType>SMTPS</connectionType>
+    <host>{${configs.email_smtp_host}}</host>
+    <port>465</port>
+    <username>{${configs.email_smtp_username}}</username>
+    <password>{${wso2-vault('email_smtp_password')}}</password>
+    <requireTLS/>
+    <checkServerIdentity/>
+    <name>gmailConnection</name>
+  </email.init>
+</localEntry>

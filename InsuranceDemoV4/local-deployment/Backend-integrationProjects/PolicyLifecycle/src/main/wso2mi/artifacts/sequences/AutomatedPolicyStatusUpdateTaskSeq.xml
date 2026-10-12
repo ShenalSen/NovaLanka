@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="AutomatedPolicyStatusUpdateTaskSeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log category="INFO">
+        <message>AutomatedPolicyStatusUpdateTask: Starting expired policy status update</message>
+    </log>
+    <!-- Update all Active policies whose end_date has passed to Expired -->
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDS</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[UPDATE policies SET status = 'Expired' WHERE status = 'Active' AND end_date < CURDATE()]]></sql>
+        </statement>
+    </dbreport>
+    <log category="INFO">
+        <message>AutomatedPolicyStatusUpdateTask: Expired policy status update completed</message>
+    </log>
+</sequence>

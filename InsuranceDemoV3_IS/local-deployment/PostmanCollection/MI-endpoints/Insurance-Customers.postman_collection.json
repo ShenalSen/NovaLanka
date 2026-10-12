@@ -1,0 +1,214 @@
+{
+	"info": {
+		"_postman_id": "51439572-3b36-45f4-a3ec-488f0fa11f3e",
+		"name": "Insurance-Customers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/DataService-MI~76a70266-115f-4bf4-9b6d-4bf9cb266488/collection/42569940-51439572-3b36-45f4-a3ec-488f0fa11f3e?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Customers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Customer",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer\": {\n        \"customer_id\": \"C_002\",\n        \"first_name\": \"Divya\",\n        \"last_name\": \"Perera\",\n        \"dob\": \"1992-05-12\",\n        \"gender\": \"Female\",\n        \"email\": \"nadeesha.perea@example.com\",\n        \"phone\": \"0772223344\",\n        \"address\": \"No. 45, Green Lane, Negombo\",\n        \"status\": \"inactive\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customer/C_002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customer",
+						"C_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer\": {\n        \"first_name\": \"Nadeesha\",\n        \"last_name\": \"Perera\",\n        \"dob\": \"1992-05-12\",\n        \"gender\": \"Female\",\n        \"email\": \"ui.perra@exaple.com\",\n        \"phone\": \"0772223344\",\n        \"address\": \"No. 45, Green Lane, Negombo\",\n        \"status\": \"inactive\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customer/C_006",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customer",
+						"C_006"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customer/C_002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customer",
+						"C_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total customers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customers/count",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customers",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customer Details by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceCustomersService/customers/byemployee/E_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceCustomersService",
+						"customers",
+						"byemployee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "CUST123456"
+		}
+	]
+}

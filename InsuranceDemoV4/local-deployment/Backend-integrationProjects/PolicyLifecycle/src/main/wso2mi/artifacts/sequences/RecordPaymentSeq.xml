@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="RecordPaymentSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Record payment for a policy -->
+    <log category="INFO">
+        <message>Recording payment for policy: ${vars.policyId}</message>
+    </log>
+    <payloadFactory media-type="json">
+        <format>{
+            "policy_id": "${vars.policyId}",
+            "first_name": "${vars.firstName}",
+            "last_name": "${vars.lastName}",
+            "nic_number": "${vars.nicNumber}",
+            "email": "${vars.email}",
+            "mobile_number": "${vars.mobileNumber}",
+            "address": "${vars.address}",
+            "amount": ${vars.totalPremium},
+            "tran_date": "${vars.tranDate}",
+            "payment_method": "${vars.paymentMethod}",
+            "status": "Success"
+            }</format>
+    </payloadFactory>
+    <http.post configKey="ApiGateway">
+        <relativePath>/payments-api/1.0.0/</relativePath>
+        <headers>[{"Content-Type":"application/json"},{"accept":"*/*"}]</headers>
+        <requestBodyJson>${payload}</requestBodyJson>
+        <forceScAccepted>false</forceScAccepted>
+        <disableChunking>false</disableChunking>
+        <forceHttp10>false</forceHttp10>
+        <noKeepAlive>false</noKeepAlive>
+        <forcePostPutNobody>false</forcePostPutNobody>
+        <responseVariable>paymentResponse</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </http.post>
+    <!-- Extract payment details -->
+    <variable name="paymentId" type="STRING" expression="${vars.paymentResponse.payload.payment_id}"/>
+    <variable name="paymentStatus" type="STRING" expression="${vars.paymentResponse.payload.status}"/>
+    <log category="INFO">
+        <message>Payment recorded with ID: ${vars.paymentId}, status: ${vars.paymentStatus}</message>
+    </log>
+</sequence>

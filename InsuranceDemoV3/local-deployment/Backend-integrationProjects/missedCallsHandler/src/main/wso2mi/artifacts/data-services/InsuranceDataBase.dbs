@@ -1,0 +1,95 @@
+<data name="InsuranceDataBase" serviceNamespace="" serviceGroup="" transports="http https" disableStreaming="true">
+    <description>InsuranceDataBase</description>
+    <config id="Insurance Demo">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+
+    <!-- Get customer id by mobile number -->
+    <query id="getClientByMobile" useConfig="Insurance Demo">
+        <sql>SELECT customer_id FROM customers WHERE phone = :phone</sql>
+        <param name="phone" paramType="SCALAR" sqlType="STRING" type="IN"/>
+        <result outputType="json">
+            {
+            "customers": {
+            "customer": [
+            {
+            "customer_id": "$customer_id"
+            }
+            ]
+            }
+            }
+        </result>
+    </query>
+    <operation name="getClientByMobile">
+        <call-query href="getClientByMobile">
+            <with-param name="phone" query-param="phone"/>
+        </call-query>
+    </operation>
+
+    <!-- Get policy details by customer id -->
+    <query id="getPolicyByCustomerId" useConfig="Insurance Demo">
+        <sql>SELECT policy_id, next_due_date FROM policies WHERE customer_id = :customer_id AND status = 'Active' ORDER BY start_date DESC LIMIT 3</sql>
+        <param name="customer_id" paramType="SCALAR" sqlType="STRING" type="IN"/>
+        <result outputType="json">
+            {
+            "policies": {
+            "policy": [
+            {
+            "policy_id": "$policy_id",
+            "next_due_date": "$next_due_date"
+            }
+            ]
+            }
+            }
+        </result>
+    </query>
+    <operation name="getPolicyByCustomerId">
+        <call-query href="getPolicyByCustomerId">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </operation>
+
+    <!-- Get the latest payment details by policy id -->
+    <query id="getPolicyPayments" useConfig="Insurance Demo">
+        <sql>SELECT amount, DATE_FORMAT(tran_date, '%d/%m/%Y') AS TranDate FROM policy_payments WHERE policy_id = :policy_id ORDER BY tran_date DESC LIMIT 1</sql>
+        <param name="policy_id" paramType="SCALAR" sqlType="STRING" type="IN"/>
+        <result outputType="json">
+            {
+            "policy_payments": {
+            "payment": [
+            {
+            "amount": "$amount",
+            "tran_date": "$TranDate"
+            }
+            ]
+            }
+            }
+        </result>
+    </query>
+    <operation name="getPolicyPayments">
+        <call-query href="getPolicyPayments">
+            <with-param name="policy_id" query-param="policy_id"/>
+        </call-query>
+    </operation>
+
+    <!-- Get customer email by customer id -->
+    <query id="getEmailByCustomerId" useConfig="Insurance Demo">
+        <sql>SELECT email FROM customers WHERE customer_id = :customer_id</sql>
+        <param name="customer_id" paramType="SCALAR" sqlType="STRING" type="IN"/>
+        <result outputType="json">
+            {
+            "customer_email": {
+            "email": "$email"
+            }
+            }
+        </result>
+    </query>
+    <operation name="getEmailByCustomerId">
+        <call-query href="getEmailByCustomerId">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </operation>
+</data>

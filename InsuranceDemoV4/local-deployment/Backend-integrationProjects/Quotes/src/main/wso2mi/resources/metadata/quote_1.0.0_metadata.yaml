@@ -1,0 +1,10 @@
+---
+key: "quote-1.0.0"
+name : "quote"
+displayName : "quote"
+description: "quote"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/quote"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

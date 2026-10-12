@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="PolicyStatementSeq" onError="PolicyStatementFaultSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Set email subject based on stmt_type -->
+    <filter xpath="${vars.stmt_type == 'RENEWAL'}">
+        <then>
+            <variable name="stmt_subject" type="STRING"
+                expression="${'Your Policy ' + vars.stmt_policy_id + ' Has Been Renewed — Statement Enclosed'}"/>
+        </then>
+        <else>
+            <variable name="stmt_subject" type="STRING"
+                value="Welcome to NOVA Lanka Insurance — Your Policy Statement"/>
+        </else>
+    </filter>
+    <!-- Build HTML email body using FreeMarker payloadFactory (no script mediator) -->
+    <payloadFactory media-type="text" template-type="freemarker">
+        <format><![CDATA[<html><body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+<tr><td style="background:linear-gradient(135deg,#6c47ff,#4f35cc);padding:36px 40px;text-align:center;">
+<h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">NOVA Lanka Insurance</h1>
+<p style="margin:8px 0 0;color:#ddd6fe;font-size:14px;">Policy Statement &amp; Cover Note</p>
+</td></tr>
+
+<tr><td style="padding:32px 40px 0;text-align:center;">
+<#if vars.stmt_type == "RENEWAL">
+<span style="display:inline-block;background:#d1fae5;color:#065f46;font-size:13px;font-weight:600;padding:6px 18px;border-radius:20px;">&#10003; Policy Renewed</span>
+<#else>
+<span style="display:inline-block;background:#d1fae5;color:#065f46;font-size:13px;font-weight:600;padding:6px 18px;border-radius:20px;">&#10003; Policy Issued</span>
+</#if>
+<h2 style="margin:16px 0 6px;color:#111827;font-size:20px;">Dear ${vars.stmt_first_name} ${vars.stmt_last_name},</h2>
+<p style="margin:0;color:#6b7280;font-size:14px;line-height:1.6;">
+<#if vars.stmt_type == "RENEWAL">
+Your insurance policy has been successfully renewed. Below is your updated policy statement.
+<#else>
+Thank you for choosing NOVA Lanka Insurance. Your policy has been issued and is now active. Below is your policy statement and cover note.
+</#if>
+</p>
+</td></tr>
+
+<tr><td style="padding:28px 40px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;overflow:hidden;">
+<tr style="background:#6c47ff;"><td colspan="2" style="padding:12px 20px;color:#ffffff;font-size:13px;font-weight:600;letter-spacing:0.5px;">POLICY DETAILS</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;width:45%;">Policy ID</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;font-weight:600;">${vars.stmt_policy_id}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;background:#ffffff;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Policy Holder</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;font-weight:600;">${vars.stmt_first_name} ${vars.stmt_last_name}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Product ID</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;">${vars.stmt_product_id}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;background:#ffffff;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Coverage Details</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;">${vars.stmt_policy_details}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Start Date</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;">${vars.stmt_start_date}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;background:#ffffff;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;"><#if vars.stmt_type == "RENEWAL">New End Date<#else>End Date</#if></td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;font-weight:600;">${vars.stmt_end_date}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Premium Amount</td>
+<td style="padding:12px 20px;color:#6c47ff;font-size:14px;font-weight:700;">LKR ${vars.stmt_premium_amount}</td></tr>
+
+<tr style="border-bottom:1px solid #e5e7eb;background:#ffffff;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Payment Method</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;">${vars.stmt_payment_method}</td></tr>
+
+<tr style="background:#f9fafb;">
+<td style="padding:12px 20px;color:#6b7280;font-size:13px;">Payment Reference</td>
+<td style="padding:12px 20px;color:#111827;font-size:13px;font-weight:600;">${vars.stmt_payment_id}</td></tr>
+
+</table></td></tr>
+
+<tr><td style="padding:0 40px 32px;">
+<p style="margin:0;color:#6b7280;font-size:12px;line-height:1.7;border-top:1px solid #e5e7eb;padding-top:20px;">
+This is an official policy statement issued by NOVA Lanka Insurance. Please retain this document for your records.
+For any queries, contact our support team. &#x2014; NOVA Lanka Insurance.
+</p></td></tr>
+
+</table>
+</td></tr></table>
+</body></html>]]></format>
+    </payloadFactory>
+    <variable name="emailHtmlBody" type="STRING" expression="${payload.text}"/>
+    <log category="INFO">
+        <message>PolicyStatementSeq: Sending policy statement to ${vars.stmt_email} for policy ${vars.stmt_policy_id}</message>
+    </log>
+    <email.send configKey="gmailConn">
+        <from>{${configs.email_from}}</from>
+        <personalName>NOVA Lanka Insurance</personalName>
+        <to>{${vars.stmt_email}}</to>
+        <subject>{${vars.stmt_subject}}</subject>
+        <content>{${vars.emailHtmlBody}}</content>
+        <contentType>text/html</contentType>
+        <encoding>UTF-8</encoding>
+        <responseVariable>stmtEmailResult</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </email.send>
+    <log category="INFO">
+        <message>PolicyStatementSeq: Statement email dispatched for policy ${vars.stmt_policy_id}</message>
+    </log>
+</sequence>

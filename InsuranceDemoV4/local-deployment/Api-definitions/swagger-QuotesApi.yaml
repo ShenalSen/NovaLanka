@@ -1,0 +1,325 @@
+openapi: 3.0.1
+info:
+  title: quotes-api
+  description: API Definition of quotes-api
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8290/quotes/v1'
+  - url: 'https://localhost:8253/quotes/v1'
+security:
+  - default: []
+paths:
+  /quote:
+    post:
+      summary: Create a new insurance quote.
+      requestBody:
+        description: Quote request payload.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+        required: true
+      responses:
+        '201':
+          description: Quote created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponse'
+        '400':
+          description: Validation error — missing required fields or out of range values.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_fields:
+                  value:
+                    error: 'Missing required fields: product_id, age, sum_assured, term_years, frequency'
+                age_out_of_range:
+                  value:
+                    error: Age must be between 18 and 60.
+                    allowed:
+                      min: 18
+                      max: 60
+                sum_assured_too_low:
+                  value:
+                    error: Sum assured must be at least $ 1,000,000.00
+                    allowed:
+                      min: 1000000
+                term_out_of_range:
+                  value:
+                    error: Term must be between 5 and 30 years.
+                    allowed:
+                      min: 5
+                      max: 30
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Product not found.
+                product_id: P_001
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/quote/{id}':
+    get:
+      summary: Retrieve a quote by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: QT_20240130120000123
+      responses:
+        '200':
+          description: Quote retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponse'
+        '404':
+          description: Quote not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    patch:
+      summary: Update quote status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Status update
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - Draft
+                    - Bought
+                    - Expired
+                    - Cancelled
+        required: true
+      responses:
+        '200':
+          description: Quote status updated.
+        '400':
+          description: Invalid status value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Quote not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  schemas:
+    QuoteRequest:
+      type: object
+      required:
+        - product_id
+        - age
+        - sum_assured
+        - term_years
+        - frequency
+      properties:
+        product_id:
+          type: string
+          description: Identifier of the insurance product
+          example: P_001
+        age:
+          type: integer
+          description: Age of the applicant (must be between 18 and 60)
+          minimum: 18
+          maximum: 60
+          example: 35
+        sum_assured:
+          type: number
+          format: double
+          description: Coverage amount (must be at least 1,000,000)
+          minimum: 1000000
+          example: 5000000
+        term_years:
+          type: integer
+          description: Policy term in years (must be between 5 and 30)
+          minimum: 5
+          maximum: 30
+          example: 20
+        frequency:
+          type: string
+          description: Premium payment frequency
+          enum:
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUAL
+            - ANNUAL
+          example: MONTHLY
+        coverage_type:
+          type: string
+          description: Type of coverage (defaults to STANDARD if omitted)
+          enum:
+            - STANDARD
+            - PREMIUM
+          example: STANDARD
+    QuoteResponse:
+      type: object
+      properties:
+        quote_id:
+          type: string
+          description: Generated unique quote identifier
+          example: QT_20240130120000123
+        product_id:
+          type: string
+          example: P_001
+        coverage_type:
+          type: string
+          enum:
+            - STANDARD
+            - PREMIUM
+          example: STANDARD
+        age:
+          type: integer
+          example: 35
+        sum_assured:
+          type: number
+          format: double
+          example: 5000000
+        term_years:
+          type: integer
+          example: 20
+        frequency:
+          type: string
+          enum:
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUAL
+            - ANNUAL
+          example: MONTHLY
+        base_premium:
+          type: number
+          format: double
+          description: Annual base premium before frequency adjustment.
+          example: 12500.00
+        total_premium:
+          type: number
+          format: double
+          description: Per period premium amount based on payment frequency.
+          example: 1041.67
+        status:
+          type: string
+          enum:
+            - Draft
+            - Bought
+            - Expired
+            - Cancelled
+          example: Draft
+        valid_until:
+          type: string
+          format: date-time
+          description: Quote expiry timestamp (7 days from creation)
+          example: '2024-02-06T12:00:00'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human readable error message
+        allowed:
+          type: object
+          description: Allowed range or values (present on range-validation errors)
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+        product_id:
+          type: string
+          description: Echo of the invalid product_id (present on 404)
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://test.com'
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:8290/quotes/v1'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:8290/quotes/v1'
+  type: http
+x-wso2-basePath: /quotes-api/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

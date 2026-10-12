@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  insurance-product-service:
+    image: insurance-product-service:1.0.0-SNAPSHOT
+    ports:
+      -  8290:8290   
+      - 8253:8253   
+      - 9201:9201   
+      - 9164:9164   
+    environment:
+      - MI_PORT=8290
+
+    depends_on:
+      db:
+        condition: service_healthy  
+  db:
+    build: ./Database
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: insurance_db
+    ports:
+      - 3306:3306  
+    volumes:
+      - db_data:/var/lib/mysql  
+      - ./Database/insurance_products.sql:/docker-entrypoint-insurance_productsdb.d/insurance_products.sql  
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p12345"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  micro-integration:
+    build: ./wso2mi-4.4.0
+    container_name: mi-server
+    volumes:
+      - ./wso2mi-4.4.0:/opt/mi  
+    working_dir: /opt/mi/bin  
+    entrypoint: ["/bin/sh", "-c", "/opt/mi/bin/wait-for-db.sh && sh run-mi.sh"]  
+    depends_on:
+      db:
+        condition: service_healthy  
+    ports:
+      - 8290:8290   
+      - 8253:8253   
+      - 9201:9201   
+      - 9164:9164   
+volumes:
+  db_data:

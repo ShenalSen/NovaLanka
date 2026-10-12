@@ -1,0 +1,57 @@
+openapi: 3.0.1
+info:
+  title: PolicyLifecycleAPI
+  description: API Definition of PolicyLifecycleAPI
+  version: 1.0.0
+servers:
+  - url: http://localhost:8290/policy-lifecycle/v1
+  - url: https://localhost:8253/policy-lifecycle/v1
+paths:
+  /purchase:
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response
+  /policy/{policy_id}/renew:
+    post:
+      parameters:
+        - name: policy_id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response

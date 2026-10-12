@@ -1,0 +1,319 @@
+<data name="InsuranceClaimsService" transports="http https" enableJSONSupportForIEP="true">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+    <!-- Get All Claims -->
+    <query id="getAllClaims" useConfig="default">
+        <sql>SELECT * FROM claims</sql>
+        <result outputType="json">
+            {
+            "Claims": {
+            "Claim": [
+            {
+            "claim_id": "$claim_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "email": "$email",
+            "mobile_number": "$mobile_number",
+            "address": "$address",
+            "policy_id": "$policy_id",
+            "type_of_policy": "$type_of_policy",
+            "policy_value": "$policy_value",
+            "submitted_date": "$submitted_date",
+            "incident_date": "$incident_date",
+            "employee_name": "$employee_name",
+            "current_status": "$current_status",
+            "incident_details": "$incident_details",
+            "loss_damage_details": "$loss_damage_details",
+            "note": "$note"
+            }
+            ]
+            }
+            }
+        </result>
+    </query>
+    <resource method="GET" path="/claims">
+        <call-query href="getAllClaims"/>
+    </resource>
+    <!-- Get Claim by ID -->
+    <query id="getClaimById" useConfig="default">
+        <sql>SELECT * FROM claims WHERE claim_id = :claim_id</sql>
+        <result outputType="json">
+            {
+            "Claim": {
+            "claim_id": "$claim_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "email": "$email",
+            "mobile_number": "$mobile_number",
+            "address": "$address",
+            "policy_id": "$policy_id",
+            "type_of_policy": "$type_of_policy",
+            "policy_value": "$policy_value",
+            "submitted_date": "$submitted_date",
+            "incident_date": "$incident_date",
+            "employee_name": "$employee_name",
+            "current_status": "$current_status",
+            "incident_details": "$incident_details",
+            "loss_damage_details": "$loss_damage_details",
+            "note": "$note"
+            }
+            }
+        </result>
+        <param name="claim_id" sqlType="STRING"/>
+    </query>
+    <resource method="GET" path="/claim/{claim_id}">
+        <call-query href="getClaimById">
+            <with-param name="claim_id" query-param="claim_id"/>
+        </call-query>
+    </resource>
+    <!-- Insert Claim -->
+    <query id="createClaim" useConfig="default">
+        <sql>
+            INSERT INTO claims (
+            first_name, last_name, email, mobile_number, address,
+            policy_id, type_of_policy, policy_value, submitted_date, incident_date,
+            employee_name, current_status, incident_details, loss_damage_details, note
+            ) VALUES (
+            :first_name, :last_name, :email, :mobile_number, :address,
+            :policy_id, :type_of_policy, :policy_value, :submitted_date, :incident_date,
+            :employee_name, :current_status, :incident_details, :loss_damage_details, :note
+            )
+        </sql>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="mobile_number" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+        <param name="policy_id" sqlType="STRING"/>
+        <param name="type_of_policy" sqlType="STRING"/>
+        <param name="policy_value" sqlType="DOUBLE"/>
+        <param name="submitted_date" sqlType="DATE"/>
+        <param name="incident_date" sqlType="DATE"/>
+        <param name="employee_name" sqlType="STRING"/>
+        <param name="current_status" sqlType="STRING"/>
+        <param name="incident_details" sqlType="STRING"/>
+        <param name="loss_damage_details" sqlType="STRING"/>
+        <param name="note" sqlType="STRING"/>
+    </query>
+    <resource method="POST" path="/claim">
+        <call-query href="createClaim">
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="mobile_number" query-param="mobile_number"/>
+            <with-param name="address" query-param="address"/>
+            <with-param name="policy_id" query-param="policy_id"/>
+            <with-param name="type_of_policy" query-param="type_of_policy"/>
+            <with-param name="policy_value" query-param="policy_value"/>
+            <with-param name="submitted_date" query-param="submitted_date"/>
+            <with-param name="incident_date" query-param="incident_date"/>
+            <with-param name="employee_name" query-param="employee_name"/>
+            <with-param name="current_status" query-param="current_status"/>
+            <with-param name="incident_details" query-param="incident_details"/>
+            <with-param name="loss_damage_details" query-param="loss_damage_details"/>
+            <with-param name="note" query-param="note"/>
+        </call-query>
+    </resource>
+    <!-- Get Claims by Customer ID -->
+    <query id="getClaimsByCustomerId" useConfig="default">
+        <sql>
+            SELECT c.*
+            FROM claims c
+            INNER JOIN policies p ON c.policy_id = p.policy_id
+            WHERE p.customer_id = :customer_id
+        </sql>
+        <result outputType="json">
+            {
+            "Claims": {
+            "Claim": [
+            {
+            "claim_id": "$claim_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "email": "$email",
+            "mobile_number": "$mobile_number",
+            "address": "$address",
+            "policy_id": "$policy_id",
+            "type_of_policy": "$type_of_policy",
+            "policy_value": "$policy_value",
+            "submitted_date": "$submitted_date",
+            "incident_date": "$incident_date",
+            "employee_name": "$employee_name",
+            "current_status": "$current_status",
+            "incident_details": "$incident_details",
+            "loss_damage_details": "$loss_damage_details",
+            "note": "$note"
+            }
+            ]
+            }
+            }
+        </result>
+        <param name="customer_id" sqlType="STRING"/>
+    </query>
+    <resource method="GET" path="/claims/customer/{customer_id}">
+        <call-query href="getClaimsByCustomerId">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </resource>
+    <!-- Update Claim -->
+    <query id="updateClaim" useConfig="default">
+        <sql>
+            UPDATE claims SET
+            first_name = :first_name,
+            last_name = :last_name,
+            email = :email,
+            mobile_number = :mobile_number,
+            address = :address,
+            policy_id = :policy_id,
+            type_of_policy = :type_of_policy,
+            policy_value = :policy_value,
+            submitted_date = :submitted_date,
+            incident_date = :incident_date,
+            employee_name = :employee_name,
+            current_status = :current_status,
+            incident_details = :incident_details,
+            loss_damage_details = :loss_damage_details,
+            note = :note
+            WHERE claim_id = :claim_id
+        </sql>
+        <param name="claim_id" sqlType="STRING"/>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="mobile_number" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+        <param name="policy_id" sqlType="STRING"/>
+        <param name="type_of_policy" sqlType="STRING"/>
+        <param name="policy_value" sqlType="DOUBLE"/>
+        <param name="submitted_date" sqlType="DATE"/>
+        <param name="incident_date" sqlType="DATE"/>
+        <param name="employee_name" sqlType="STRING"/>
+        <param name="current_status" sqlType="STRING"/>
+        <param name="incident_details" sqlType="STRING"/>
+        <param name="loss_damage_details" sqlType="STRING"/>
+        <param name="note" sqlType="STRING"/>
+    </query>
+    <resource method="PUT" path="/claim/{claim_id}">
+        <call-query href="updateClaim">
+            <with-param name="claim_id" query-param="claim_id"/>
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="mobile_number" query-param="mobile_number"/>
+            <with-param name="address" query-param="address"/>
+            <with-param name="policy_id" query-param="policy_id"/>
+            <with-param name="type_of_policy" query-param="type_of_policy"/>
+            <with-param name="policy_value" query-param="policy_value"/>
+            <with-param name="submitted_date" query-param="submitted_date"/>
+            <with-param name="incident_date" query-param="incident_date"/>
+            <with-param name="employee_name" query-param="employee_name"/>
+            <with-param name="current_status" query-param="current_status"/>
+            <with-param name="incident_details" query-param="incident_details"/>
+            <with-param name="loss_damage_details" query-param="loss_damage_details"/>
+            <with-param name="note" query-param="note"/>
+        </call-query>
+    </resource>
+
+
+    <!-- Get Total Claim Count -->
+<query id="getTotalClaimCount" useConfig="default">
+    <sql>SELECT COUNT(*) AS total_claims FROM claims</sql>
+    <result outputType="json">
+        {
+        "ClaimSummary": {
+            "total_claims": "$total_claims"
+        }
+        }
+    </result>
+</query>
+
+<resource method="GET" path="/claims/count">
+    <call-query href="getTotalClaimCount"/>
+</resource>
+
+
+<!-- Get Claims by Employee ID -->
+<query id="getClaimsByEmployeeId" useConfig="default">
+    <sql>
+        SELECT c.*
+        FROM claims c
+        INNER JOIN policies p ON c.policy_id = p.policy_id
+        WHERE p.employee_id = :employee_id
+    </sql>
+    <result outputType="json">
+        {
+        "Claims": {
+            "Claim": [
+            {
+            "claim_id": "$claim_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "email": "$email",
+            "mobile_number": "$mobile_number",
+            "address": "$address",
+            "policy_id": "$policy_id",
+            "type_of_policy": "$type_of_policy",
+            "policy_value": "$policy_value",
+            "submitted_date": "$submitted_date",
+            "incident_date": "$incident_date",
+            "employee_name": "$employee_name",
+            "current_status": "$current_status",
+            "incident_details": "$incident_details",
+            "loss_damage_details": "$loss_damage_details",
+            "note": "$note"
+            }
+            ]
+        }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/claims/employee/{employee_id}">
+    <call-query href="getClaimsByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+<!-- Get Claim Count by Employee ID -->
+<query id="getClaimCountByEmployeeId" useConfig="default">
+    <sql>
+        SELECT COUNT(*) AS claims_count
+        FROM claims c
+        INNER JOIN policies p ON c.policy_id = p.policy_id
+        WHERE p.employee_id = :employee_id
+    </sql>
+    <result outputType="json">
+        {
+        "ClaimSummary": {
+            "claims_count": "$claims_count"
+        }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/claims/count/employee/{employee_id}">
+    <call-query href="getClaimCountByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+
+    <!-- Delete Claim -->
+    <query id="deleteClaim" useConfig="default">
+        <sql>DELETE FROM claims WHERE claim_id = :claim_id</sql>
+        <param name="claim_id" sqlType="STRING"/>
+    </query>
+    <resource method="DELETE" path="/claim/{claim_id}">
+        <call-query href="deleteClaim">
+            <with-param name="claim_id" query-param="claim_id"/>
+        </call-query>
+    </resource>
+</data>

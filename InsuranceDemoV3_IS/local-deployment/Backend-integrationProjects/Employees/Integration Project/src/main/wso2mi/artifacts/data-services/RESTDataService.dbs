@@ -1,0 +1,153 @@
+<data name="InsuranceEmployeesService" transports="http https" serviceType="data" media-type="json">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+
+    <!-- Get All Employees -->
+    <query id="getAllEmployees" useConfig="default">
+        <sql>SELECT * FROM employees</sql>
+        <result outputType="json">{
+            "Employees": {
+                "Employee": [
+                    {
+                        "employee_id": "$employee_id",
+                        "first_name": "$first_name",
+                        "last_name": "$last_name",
+                        "role": "$role",
+                        "email": "$email",
+                        "phone": "$phone",
+                        "created_at": "$created_at",
+                        "address": "$address"
+                    }
+                ]
+            }
+        }</result>
+    </query>
+
+    <resource method="GET" path="/employees">
+        <call-query href="getAllEmployees"/>
+    </resource>
+
+    <!-- Get Employee by ID -->
+    <query id="getEmployeeById" useConfig="default">
+        <sql>SELECT * FROM employees WHERE employee_id = :employee_id</sql>
+        <result outputType="json">{
+            "Employee": {
+                "employee_id": "$employee_id",
+                "first_name": "$first_name",
+                "last_name": "$last_name",
+                "role": "$role",
+                "email": "$email",
+                "phone": "$phone",
+                "created_at": "$created_at",
+                "address": "$address"
+            }
+        }</result>
+        <param name="employee_id" sqlType="STRING"/>
+    </query>
+
+    <resource method="GET" path="/employee/{employee_id}">
+        <call-query href="getEmployeeById">
+            <with-param name="employee_id" query-param="employee_id"/>
+        </call-query>
+    </resource>
+
+
+    <!-- Insert Employee -->
+    <query id="createEmployee" useConfig="default">
+        <sql>
+            INSERT INTO employees (first_name, last_name, role, email, phone, created_at, address)
+            VALUES (:first_name, :last_name, :role, :email, :phone, NOW(), :address)
+        </sql>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="role" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="phone" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+    </query>
+
+    <resource method="POST" path="/employee">
+        <call-query href="createEmployee">
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="role" query-param="role"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="phone" query-param="phone"/>
+            <with-param name="address" query-param="address"/>
+        </call-query>
+    </resource>
+
+    <!-- Update Employee -->
+    <query id="updateEmployee" useConfig="default">
+        <sql>
+            UPDATE employees
+            SET first_name = :first_name,
+                last_name = :last_name,
+                role = :role,
+                email = :email,
+                phone = :phone,
+                address = :address
+            WHERE employee_id = :employee_id
+        </sql>
+        <param name="employee_id" sqlType="STRING"/>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="role" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="phone" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+    </query>
+
+    <resource method="PUT" path="/employee/{employee_id}">
+        <call-query href="updateEmployee">
+            <with-param name="employee_id" query-param="employee_id"/>
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="role" query-param="role"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="phone" query-param="phone"/>
+            <with-param name="address" query-param="address"/>
+        </call-query>
+    </resource>
+
+    <!-- Get Employee by Email -->
+<query id="getEmployeeByEmail" useConfig="default">
+    <sql>SELECT * FROM employees WHERE email = :email</sql>
+    <result outputType="json">{
+        "Employee": {
+            "employee_id": "$employee_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "role": "$role",
+            "email": "$email",
+            "phone": "$phone",
+            "created_at": "$created_at",
+            "address": "$address"
+        }
+    }</result>
+    <param name="email" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/employeeByEmail/{email}">
+    <call-query href="getEmployeeByEmail">
+        <with-param name="email" query-param="email"/>
+    </call-query>
+</resource>
+
+
+    <!-- Delete Employee -->
+    <query id="deleteEmployee" useConfig="default">
+        <sql>DELETE FROM employees WHERE employee_id = :employee_id</sql>
+        <param name="employee_id" sqlType="STRING"/>
+    </query>
+
+    <resource method="DELETE" path="/employee/{employee_id}">
+        <call-query href="deleteEmployee">
+            <with-param name="employee_id" query-param="employee_id"/>
+        </call-query>
+    </resource>
+</data>

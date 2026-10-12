@@ -1,0 +1,205 @@
+openapi: 3.0.1
+info:
+  title: products-api
+  version: "1.0"
+servers:
+ -
+  url: http://localhost:8290/services/InsuranceProductsService
+security:
+ -
+  default: []
+paths:
+  /products:
+    get:
+      parameters: []
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /product/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    put:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      requestBody:
+        description: Update an existing product
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInsertWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    delete:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /product:
+    post:
+      parameters: []
+      requestBody:
+        description: Create a new product
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInsertWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+components:
+  schemas:
+    ProductInsertWrapper:
+      required:
+       - Insert New Product
+      type: object
+      properties:
+        Insert New Product:
+          $ref: "#/components/schemas/Product"
+    Product:
+      required:
+       - coverage_amount
+       - coverage_type
+       - deductible
+       - description
+       - name
+       - premium
+      type: object
+      properties:
+        product_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        coverage_type:
+          type: string
+        coverage_amount:
+          type: number
+        deductible:
+          type: number
+        premium:
+          type: string
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+   - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+   - authorization
+   - Access-Control-Allow-Origin
+   - Content-Type
+   - SOAPAction
+   - apikey
+   - Internal-Key
+  accessControlAllowMethods:
+   - GET
+   - PUT
+   - POST
+   - DELETE
+   - PATCH
+   - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+   - http://localhost:8290/services/InsuranceProductsService
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+   - http://localhost:8290/services/InsuranceProductsService
+  type: http
+x-wso2-basePath: /products-api/1.0
+x-wso2-transports:
+ - http
+ - https
+x-wso2-application-security:
+  security-types:
+   - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

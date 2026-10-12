@@ -1,0 +1,207 @@
+openapi: 3.0.1
+info:
+  title: employee-api
+  version: "1.0"
+servers:
+ -
+  url: http://localhost:8290/services/InsuranceEmployeesService
+security:
+ -
+  default: []
+paths:
+  /employees:
+    get:
+      parameters: []
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /employee/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    put:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      requestBody:
+        description: Employee update payload
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    delete:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /employee:
+    post:
+      parameters: []
+      requestBody:
+        description: Employee creation payload
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+components:
+  schemas:
+    EmployeeWrapper:
+      required:
+       - employee
+      type: object
+      properties:
+        employee:
+          $ref: "#/components/schemas/Employee"
+    Employee:
+      required:
+       - address
+       - email
+       - employee_id
+       - first_name
+       - last_name
+       - phone
+       - role
+      type: object
+      properties:
+        employee_id:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        role:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+   - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+   - authorization
+   - Access-Control-Allow-Origin
+   - Content-Type
+   - SOAPAction
+   - apikey
+   - Internal-Key
+  accessControlAllowMethods:
+   - GET
+   - PUT
+   - POST
+   - DELETE
+   - PATCH
+   - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+   - http://localhost:8290/services/InsuranceEmployeesService
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+   - http://localhost:8290/services/InsuranceEmployeesService
+  type: http
+x-wso2-basePath: /employee-api/1.0
+x-wso2-transports:
+ - http
+ - https
+x-wso2-application-security:
+  security-types:
+   - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

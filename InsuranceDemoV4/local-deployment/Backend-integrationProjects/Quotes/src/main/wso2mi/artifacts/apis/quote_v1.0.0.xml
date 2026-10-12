@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/quotes/v1" name="QuotesAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- POST /quotes/v1/quote — Create an instant insurance quote -->
+    <resource methods="POST" uri-template="/quote">
+        <inSequence>
+            <sequence key="QuoteValidateSeq"/>
+            <sequence key="QuoteCalculateSeq"/>
+            <sequence key="QuotePersistSeq"/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>POST /quote error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error. Please try again later.", "code": "${properties.synapse.ERROR_CODE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+    <!-- PATCH /quotes/v1/quote/{id} — Update quote status -->
+    <resource methods="PATCH" uri-template="/quote/{id}">
+        <inSequence>
+            <dbreport>
+                <connection>
+                    <pool>
+                        <dsName>insurance</dsName>
+                        <property name="validationquery" value=""/>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>UPDATE quotes SET status = ? WHERE quote_id = ?</sql>
+                    <parameter expression="${payload.status}" type="VARCHAR"/>
+                    <parameter expression="${params.pathParams.id}" type="VARCHAR"/>
+                </statement>
+            </dbreport>
+            <payloadFactory media-type="json">
+                <format>{"message": "Quote updated successfully.", "quote_id": "${params.pathParams.id}"}</format>
+            </payloadFactory>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>PATCH /quote/{id} error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error. Please try again later.", "code": "${properties.synapse.ERROR_CODE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+
+    <!-- GET /quotes/v1/quote/{id} — Retrieve a quote by ID -->
+    <resource methods="GET" uri-template="/quote/{id}">
+        <inSequence>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <dsName>insurance</dsName>
+                        <property name="validationquery" value=""/>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql>SELECT quote_id, product_id, coverage_type, age, sum_assured, term_years, frequency, base_premium, total_premium, status, valid_until FROM quotes WHERE quote_id = ?</sql>
+                    <parameter expression="${params.pathParams.id}" type="VARCHAR"/>
+                    <result name="quoteId" column="quote_id"/>
+                    <result name="productId" column="product_id"/>
+                    <result name="coverageType" column="coverage_type"/>
+                    <result name="age" column="age"/>
+                    <result name="sumAssured" column="sum_assured"/>
+                    <result name="termYears" column="term_years"/>
+                    <result name="frequency" column="frequency"/>
+                    <result name="basePremium" column="base_premium"/>
+                    <result name="totalPremium" column="total_premium"/>
+                    <result name="status" column="status"/>
+                    <result name="validUntil" column="valid_until"/>
+                </statement>
+            </dblookup>
+            <!-- If quote not exists, respond with "404 - Quote not found." -->
+            <filter xpath="${not(exists(properties.synapse.quoteId))}">
+                <then>
+                    <payloadFactory media-type="json">
+                        <format>{"error": "Quote not found.", "quote_id": "${params.pathParams.id}"}</format>
+                    </payloadFactory>
+                    <property name="HTTP_SC" value="404" scope="axis2"/>
+                    <respond/>
+                </then>
+                <else>
+                    <log level="full">
+                        <property name="INFO" value="Quote found with ID ${properties.synapse.quoteId}, responding with quote details."/>
+                    </log>
+                </else>
+            </filter>
+            <payloadFactory media-type="json">
+                <format>{
+                    "quote_id": "${properties.synapse.quoteId}",
+                    "product_id": "${properties.synapse.productId}",
+                    "coverage_type": "${properties.synapse.coverageType}",
+                    "age": ${properties.synapse.age},
+                    "sum_assured": ${properties.synapse.sumAssured},
+                    "term_years": ${properties.synapse.termYears},
+                    "frequency": "${properties.synapse.frequency}",
+                    "base_premium": ${properties.synapse.basePremium},
+                    "total_premium": ${properties.synapse.totalPremium},
+                    "status": "${properties.synapse.status}",
+                    "valid_until": "${properties.synapse.validUntil}"
+                    }</format>
+            </payloadFactory>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>GET /quote/{id} error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error. Please try again later.", "code": "${properties.synapse.ERROR_CODE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>

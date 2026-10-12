@@ -1,0 +1,14 @@
+<datasource>
+    <name>insuranceDS</name>
+    <jndiConfig useDataSourceFactory="false">
+        <name>insuranceDS</name>
+    </jndiConfig>
+    <definition type="RDBMS">
+        <configuration>
+            <driverClassName>${configs.driver_className}</driverClassName>
+            <url>${configs.url}</url>
+            <username>${configs.username}</username>
+            <password>${configs.password}</password>
+        </configuration>
+    </definition>
+</datasource>

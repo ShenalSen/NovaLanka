@@ -1,0 +1,135 @@
+<data name="InsuranceProductsService" transports="http https">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+    <!-- Get All Products -->
+    <query id="getAllProducts" useConfig="default">
+        <sql>SELECT * FROM products</sql>
+        <result outputType="json">{
+            "Products": {
+            "Product": [
+            {
+            "product_id": "$product_id",
+            "name": "$name",
+            "description": "$description",
+            "coverage_type": "$coverage_type",
+            "coverage_amount": "$coverage_amount",
+            "deductible": "$deductible",
+            "premium": "$premium"
+            }
+            ]
+            }
+            }</result>
+    </query>
+    <resource method="GET" path="/products">
+        <call-query href="getAllProducts"/>
+    </resource>
+    <!-- Get Product by ID -->
+    <query id="getProductById" useConfig="default">
+        <sql>SELECT * FROM products WHERE product_id = :product_id</sql>
+        <result outputType="json">{
+            "Product": {
+            "product_id": "$product_id",
+            "name": "$name",
+            "description": "$description",
+            "coverage_type": "$coverage_type",
+            "coverage_amount": "$coverage_amount",
+            "deductible": "$deductible",
+            "premium": "$premium"
+            }
+            }</result>
+        <param name="product_id" sqlType="STRING"/>
+    </query>
+    <resource method="GET" path="/product/{product_id}">
+        <call-query href="getProductById">
+            <with-param name="product_id" query-param="product_id"/>
+        </call-query>
+    </resource>
+    <!-- Get Product by Coverage Type -->
+    <query id="getProductByType" useConfig="default">
+        <sql>SELECT * FROM products WHERE coverage_type = :coverage_type</sql>
+        <result outputType="json">{
+            "ProductsByType": {
+            "Product": [
+            {
+            "product_id": "$product_id",
+            "name": "$name",
+            "description": "$description",
+            "coverage_type": "$coverage_type",
+            "coverage_amount": "$coverage_amount",
+            "deductible": "$deductible",
+            "premium": "$premium"
+            }
+            ]
+            }
+            }</result>
+        <param name="coverage_type" sqlType="STRING"/>
+    </query>
+    <resource method="GET" path="/product/type/{coverage_type}">
+        <call-query href="getProductByType">
+            <with-param name="coverage_type" query-param="coverage_type"/>
+        </call-query>
+    </resource>
+    <!-- Create Product -->
+    <query id="createProduct" useConfig="default">
+        <sql>
+            INSERT INTO products (name, description, coverage_type, coverage_amount, deductible, premium)
+            VALUES (:name, :description, :coverage_type, :coverage_amount, :deductible, :premium)
+        </sql>
+        <param name="name" sqlType="STRING"/>
+        <param name="description" sqlType="STRING"/>
+        <param name="coverage_type" sqlType="STRING"/>
+        <param name="coverage_amount" sqlType="DOUBLE"/>
+        <param name="deductible" sqlType="DOUBLE"/>
+        <param name="premium" sqlType="STRING"/>
+    </query>
+    <resource method="POST" path="/product">
+        <call-query href="createProduct">
+            <with-param name="name" query-param="name"/>
+            <with-param name="description" query-param="description"/>
+            <with-param name="coverage_type" query-param="coverage_type"/>
+            <with-param name="coverage_amount" query-param="coverage_amount"/>
+            <with-param name="deductible" query-param="deductible"/>
+            <with-param name="premium" query-param="premium"/>
+        </call-query>
+    </resource>
+    <!-- Update Product -->
+    <query id="updateProduct" useConfig="default">
+        <sql>
+            UPDATE products SET name = :name, description = :description, coverage_type = :coverage_type,
+            coverage_amount = :coverage_amount, deductible = :deductible, premium = :premium
+            WHERE product_id = :product_id
+        </sql>
+        <param name="product_id" sqlType="STRING"/>
+        <param name="name" sqlType="STRING"/>
+        <param name="description" sqlType="STRING"/>
+        <param name="coverage_type" sqlType="STRING"/>
+        <param name="coverage_amount" sqlType="DOUBLE"/>
+        <param name="deductible" sqlType="DOUBLE"/>
+        <param name="premium" sqlType="STRING"/>
+    </query>
+    <resource method="PUT" path="/product/{product_id}">
+        <call-query href="updateProduct">
+            <with-param name="product_id" query-param="product_id"/>
+            <with-param name="name" query-param="name"/>
+            <with-param name="description" query-param="description"/>
+            <with-param name="coverage_type" query-param="coverage_type"/>
+            <with-param name="coverage_amount" query-param="coverage_amount"/>
+            <with-param name="deductible" query-param="deductible"/>
+            <with-param name="premium" query-param="premium"/>
+        </call-query>
+    </resource>
+    <!-- Delete Product -->
+    <query id="deleteProduct" useConfig="default">
+        <sql>DELETE FROM products WHERE product_id = :product_id</sql>
+        <param name="product_id" sqlType="STRING"/>
+    </query>
+    <resource method="DELETE" path="/product/{product_id}">
+        <call-query href="deleteProduct">
+            <with-param name="product_id" query-param="product_id"/>
+        </call-query>
+    </resource>
+</data>

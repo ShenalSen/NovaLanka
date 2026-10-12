@@ -1,0 +1,10 @@
+---
+key: "xli-1.0.0"
+name : "xli"
+displayName : "xli"
+description: "xli"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/xli"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

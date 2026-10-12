@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "ef23ccad-7703-4645-9cf5-b28c4a26a460",
+		"name": "Insurance-Policies",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-ef23ccad-7703-4645-9cf5-b28c4a26a460?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Policies",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policies",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Policy by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policy/POL_002",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policy",
+						"POL_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Policy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Create a policy\": {\r\n        \"customer_id\": \"C_002\",\r\n        \"product_id\": \"P_001\",\r\n        \"employee_id\": \"E_001\",\r\n        \"start_date\": \"2025-04-28\",\r\n        \"end_date\": \"2026-04-28\",\r\n        \"status\": \"Active\",\r\n        \"policy_details\": \"This is a sample insurance policy for testing purposes.\"\r\n    }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policy",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Policy",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Update a policy\": {\r\n        \"policy_id\": \"POL_007\",\r\n        \"customer_id\": \"C_002\",\r\n        \"product_id\": \"P_001\",\r\n        \"employee_id\": \"E_001\",\r\n        \"start_date\": \"2025-04-28\",\r\n        \"end_date\": \"2026-04-28\",\r\n        \"status\": \"Active\",\r\n        \"policy_details\": \"huiohi\"\r\n    }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policy/POL_007",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policy",
+						"POL_007"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Policy",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policy/POL_010",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policy",
+						"POL_010"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "policy by customerID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policies/customer/C_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policies",
+						"customer",
+						"C_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total policies",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policies/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policies",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total policies by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policies/count/employee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policies",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get policies by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/policies/employee/E_002",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"policies",
+						"employee",
+						"E_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get customer count by Employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/policies-api/1.0/customers/count/employee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"policies-api",
+						"1.0",
+						"customers",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

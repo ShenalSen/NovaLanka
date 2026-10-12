@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="fetchAndValidatePolicies" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Bridge variable to property for dataServiceCall param compatibility -->
+    <property name="customerId" expression="${vars.customerId}" scope="default"/>
+    <!-- Get active policies by customer ID -->
+    <dataServiceCall serviceName="InsuranceDataBase">
+        <source type="inline"/>
+        <operations type="single">
+            <operation name="getPolicyByCustomerId">
+                <param name="customer_id" expression="get-property('customerId')"/>
+            </operation>
+        </operations>
+        <target type="body"/>
+    </dataServiceCall>
+    <!-- Check policy existence, normalize and continue if found -->
+    <filter xpath="${exists(payload.policies.policy)}">
+        <then>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>${payload}</message>
+            </log>
+            <!-- Normalize policies to a consistent array format for downstream processing, even if only one policy is returned -->
+            <jsontransform description="" schema="policySchema" />
+        </then>
+        <else>
+            <log category="WARN">
+                <message>No active policies found for customer: ${vars.customerId}.</message>
+            </log>
+            <property name="HTTP_SC" value="204" scope="axis2" type="STRING"/>
+            <payloadFactory media-type="json" template-type="default">
+                <format>{
+                    "status": "no content",
+                    "message": "No active policies were found for your account.",
+                    "htmlBody": "&lt;html&gt;&lt;body style=\"font-family:Arial,sans-serif;color:#1f2937;line-height:1.6;\"&gt;&lt;p&gt;Dear Valued Customer,&lt;/p&gt;&lt;p&gt;Thank you for contacting NOVA Lanka Pvt (Ltd). We could not find any active policies linked to your account at the moment.&lt;/p&gt;&lt;p&gt;If you need help activating or renewing a policy, our support team is ready to assist you.&lt;/p&gt;&lt;p&gt;Contact us:&lt;br/&gt;Email: &lt;a href=\"mailto:support@novalanka.lk\"&gt;support@novalanka.lk&lt;/a&gt;&lt;br/&gt;Phone: +94 77 123 4567&lt;/p&gt;&lt;p&gt;We appreciate your understanding and thank you for trusting NOVA Lanka Pvt (Ltd).&lt;/p&gt;&lt;p&gt;Best regards,&lt;br/&gt;NOVA Lanka Pvt (Ltd)&lt;br/&gt;No. 123, Galle Road,&lt;br/&gt;Colombo 03, Sri Lanka&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"
+                    }</format>
+            </payloadFactory>
+            <sequence key="sendNotificationEmail"/>
+            <respond/>
+        </else>
+    </filter>
+</sequence>

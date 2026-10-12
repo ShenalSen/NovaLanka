@@ -1,0 +1,3 @@
+<localEntry key="emailTemplate" xmlns="http://ws.apache.org/ns/synapse"><![CDATA[{
+"htmlBody": "<html><body style=\"font-family:Arial,sans-serif;color:#1f2937;line-height:1.6;\"><p>Dear Valued Customer,</p><p>Thank you for contacting NOVA Lanka Pvt (Ltd). Here is the latest update on your active policy information:</p><ul style=\"line-height:2;\"><#list payload.messages as msg><li>${msg}</li></#list></ul><p>Contact us:<br/>Email: <a href=\"mailto:support@novalanka.lk\">support@novalanka.lk</a><br/>Phone: +94 77 123 4567</p><p>We appreciate your understanding and thank you for trusting NOVA Lanka Pvt (Ltd).</p><p>Best regards,<br/>NOVA Lanka Pvt (Ltd)<br/>No. 123, Galle Road,<br/>Colombo 03, Sri Lanka</p></body></html>"
+}]]></localEntry>

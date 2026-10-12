@@ -1,0 +1,138 @@
+openapi: 3.0.1
+info:
+  title: policy-sync-api
+  description: |
+    Admin API to trigger policy data synchronization. Locks the batch_control gate, refreshes the valid_policies mirror table from the source policies table, and unlocks the gate.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8290/policies/v1
+  - url: https://localhost:8253/policies/v1
+security:
+  - default: []
+paths:
+  /trigger-sync:
+    post:
+      summary: Trigger policy data synchronization.
+      operationId: triggerSync
+      requestBody:
+        description: No request body required.
+        content:
+          application/json:
+            schema:
+              type: object
+        required: false
+      responses:
+        "202":
+          description: Sync request accepted and initiated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+              example:
+                status: accepted
+                message: Policy sync initiated.
+        "401":
+          description: Sync request unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+              example:
+                error: Unauthorized
+                details: You are not authorized to perform this action.
+        "403":
+          description: Sync request forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+              example:
+                error: Forbidden
+                details: You are not allowed to perform this action.
+        "500":
+          description: Sync trigger failed due to server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+              example:
+                error: Internal server error
+                details:
+                  An error occurred while initiating the policy sync. Please
+                  try again later.
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - "*"
+  accessControlAllowCredentials: true
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - http://localhost:8290/policies/v1
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - http://localhost:8290/policies/v1
+  type: http
+x-wso2-basePath: /policies/v1
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

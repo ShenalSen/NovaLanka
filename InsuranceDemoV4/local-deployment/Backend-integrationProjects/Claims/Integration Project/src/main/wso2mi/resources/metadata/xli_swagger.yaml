@@ -1,0 +1,117 @@
+openapi: 3.0.1
+info:
+  title: InsuranceClaimsAPI
+  description: API Definition of InsuranceClaimsAPI
+  version: 1.0.0
+servers:
+- url: http://localhost:8290/claims-api
+paths:
+  /claims:
+    get:
+      responses:
+        default:
+          description: Default response
+  /claim/{claim_id}:
+    get:
+      parameters:
+      - name: claim_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Default response
+    put:
+      parameters:
+      - name: claim_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response
+    delete:
+      parameters:
+      - name: claim_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Default response
+  /claims/customer/{customer_id}:
+    get:
+      parameters:
+      - name: customer_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Default response
+  /claim:
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response
+  /claims/count:
+    get:
+      responses:
+        default:
+          description: Default response
+  /claims/employee/{employee_id}:
+    get:
+      parameters:
+      - name: employee_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Default response
+  /claims/count/employee/{employee_id}:
+    get:
+      parameters:
+      - name: employee_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: Default response

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="QuoteValidateSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Validate required fields -->
+    <filter xpath="${not(exists(payload.product_id)) or not(exists(payload.age)) or not(exists(payload.sum_assured)) or not(exists(payload.term_years)) or not(exists(payload.frequency))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Missing required fields: product_id, age, sum_assured, term_years, frequency"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="true">
+                <message>Payload verified successfully.</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Constants for age validation -->
+    <variable name="min_age" type="INTEGER" value="18"/>
+    <variable name="max_age" type="INTEGER" value="60"/>
+    <!-- Validate age bounds -->
+    <filter xpath="${(payload.age &lt; vars.min_age) or (payload.age &gt; vars.max_age)}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Age must be between 18 and 60.", "allowed": {"min": 18, "max": 60}}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Age verified successfully.</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Validate sum_assured: >= 1,000,000 -->
+    <variable name="sumDivisor" type="INTEGER" value="1000000"/>
+    <filter xpath="${payload.sum_assured &lt; vars.sumDivisor}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Sum assured must be at least $ 1,000,000.00", "allowed": {"min": ${vars.sumDivisor}}}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Sum assured verified successfully.</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Constants for term years validation -->
+    <variable name="min_term" type="INTEGER" value="5"/>
+    <variable name="max_term" type="INTEGER" value="30"/>
+    <!-- Validate term: 5–30 years -->
+    <filter xpath="${(payload.term_years &lt; vars.min_term) or (payload.term_years &gt; vars.max_term)}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Term must be between 5 and 30 years.", "allowed": {"min": ${vars.min_term}, "max": ${vars.max_term}}}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Term years verified successfully.</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Store validated request fields as variables for downstream sequences -->
+    <variable name="productId" type="STRING" expression="${payload.product_id}"/>
+    <variable name="age" type="INTEGER" expression="${payload.age}"/>
+    <variable name="sumAssured" type="DOUBLE" expression="${payload.sum_assured}"/>
+    <variable name="termYears" type="INTEGER" expression="${payload.term_years}"/>
+    <variable name="frequency" type="STRING" expression="${payload.frequency}"/>
+    <variable name="coverageType" type="STRING" expression="${exists(payload.coverage_type) ? payload.coverage_type : &quot;STANDARD&quot;}"/>
+</sequence>

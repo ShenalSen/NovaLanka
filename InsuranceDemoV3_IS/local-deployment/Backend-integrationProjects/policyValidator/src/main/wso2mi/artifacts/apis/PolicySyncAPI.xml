@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/policies/v1" name="PolicySyncAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/trigger-sync">
+        <inSequence>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>PolicySyncAPI: Received sync trigger request.</message>
+            </log>
+            <!-- Synchronize valid policies: lock gatekeeper, insert new active policies, remove inactive policies, and unlock gatekeeper -->
+            <sequence key="SyncPoliciesSeq"/>
+            <payloadFactory media-type="json">
+                <format>{"status": "accepted", "message": "Policy sync initiated."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="202" scope="axis2"/>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR" logMessageID="false" logFullPayload="false">
+                <message>PolicySyncAPI error : ${props.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Sync trigger failed.", "details": "${props.synapse.ERROR_MESSAGE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>

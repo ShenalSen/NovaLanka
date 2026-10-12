@@ -1,0 +1,136 @@
+services:
+  # =========================================================
+  # MySQL Database Service
+  # =========================================================
+  mysql:
+    image: mysql:8.0
+    container_name: insurance-mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-12345}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-insurance}
+
+    # MySQL is exposed ONLY if you need local access (e.g., MySQL Workbench)
+    ports:
+      - "${MYSQL_HOST_PORT:-3306}:3306"
+
+    volumes:
+      # Persistent DB storage
+      - mysql_data:/var/lib/mysql
+
+      # Init scripts (schema, seed data)
+      - ./src/database/mysql-scripts:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+    networks:
+      - insurance-network
+
+
+  # =========================================================
+  # WSO2 Insurance Platform
+  # Includes:
+  #   - API Manager
+  #   - Identity Server
+  #   - Micro Integrator
+  #   - Integration Control Plane
+  #   - Frontend (Vite)
+  # =========================================================
+  wso2-insurance:
+    container_name: insurance-platform
+
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE_PATH:-Dockerfile}
+      args:
+        MODIFY_APIM_VERSION: ${APIM_VERSION:-4.6.0}
+        MODIFY_MI_VERSION: ${MI_VERSION:-4.5.0}
+        MODIFY_IS_VERSION: ${IS_VERSION:-7.2.0}
+        MODIFY_ICP_VERSION: ${ICP_VERSION:-1.2.0}
+        BUILD_PLATFORM: ${BUILD_PLATFORM:-linux/amd64}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    environment:
+      # MySQL connection (Docker internal networking)
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-insurance}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-12345}
+
+      # WSO2 configuration
+      APIM_PORT_OFFSET: ${APIM_PORT_OFFSET:-3}
+      MI_JAVA_OPTS: ${MI_JAVA_OPTS:--Xms256m -Xmx1024m}
+
+    # =========================================================
+    # Exposed Ports (NO DUPLICATES)
+    # =========================================================
+    ports:
+      # -------- API Manager --------
+      - "${APIM_CONSOLE_PORT:-9446}:9446"     # APIM Carbon Console
+      - "${APIM_GATEWAY_HTTPS_PORT:-8246}:8246"
+      - "${APIM_GATEWAY_HTTP_PORT:-8280}:8280"
+      - "${APIM_WS_PORT:-9099}:9099"
+
+      # -------- Identity Server --------
+      - "${IS_CONSOLE_PORT:-9443}:9443"       # IS Carbon Console
+      - "${IS_HTTP_PORT:-9763}:9763"
+
+      # -------- Micro Integrator --------
+      - "${MI_HTTP_PORT:-8290}:8290"
+      - "${MI_HTTPS_PORT:-8253}:8253"
+      - "${MI_ADMIN_PORT:-9164}:9164"
+
+      # -------- Integration Control Plane --------
+      - "${ICP_PORT:-9743}:9743"
+
+      # -------- Frontend (Vite) --------
+      - "${FRONTEND_PORT:-5173}:5173"
+
+    volumes:
+      # Persistent WSO2 runtime data
+      - wso2_data:/home/wso2carbon
+
+      # Frontend build/runtime data
+      - frontend_data:/home/wso2/app
+
+      # API definitions (read-only)
+      - ./src/backend/apis:/api-definitions:ro
+
+      # MI Carbon Applications (hot deploy)
+      - ./src/backend/micro-integrator/carbonapps:/home/wso2carbon/wso2mi/repository/deployment/server/carbonapps:rw
+
+    networks:
+      - insurance-network
+
+    # Useful for debugging / interactive shells
+    stdin_open: true
+    tty: true
+
+
+# =========================================================
+# Persistent Volumes
+# =========================================================
+volumes:
+  mysql_data:
+    driver: local
+
+  wso2_data:
+    driver: local
+
+  frontend_data:
+    driver: local
+
+
+# =========================================================
+# Docker Network
+# =========================================================
+networks:
+  insurance-network:
+    driver: bridge

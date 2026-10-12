@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "a7ddc741-5d60-457f-b489-ebe7061fcb51",
+		"name": "Insurance-Products",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-a7ddc741-5d60-457f-b489-ebe7061fcb51?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Products",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/products-api/1.0/products",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"products-api",
+						"1.0",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get A Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/products-api/1.0/product/P_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"products-api",
+						"1.0",
+						"product",
+						"P_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete by Id",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/products-api/1.0/product/P_008",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"products-api",
+						"1.0",
+						"product",
+						"P_008"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert a new product",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Insert New Product\": {\r\n        \"name\": \"Auto Insurance\",\r\n        \"description\": \"Covers all vehicle-related damages including theft and accidents\",\r\n        \"coverage_type\": \"Auto\",\r\n        \"coverage_amount\": 1000000.00,\r\n        \"deductible\": 5000.00,\r\n        \"premium\": \"12000.00\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/products-api/1.0/product",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"products-api",
+						"1.0",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Insert New Product\": {\r\n        \"product_id\": \"P_003\",\r\n        \"name\": \" Insurance\",\r\n        \"description\": \"Covers all vehicle-related damages including theft and accidents\",\r\n        \"coverage_type\": \"Auto\",\r\n        \"coverage_amount\": 1000000.00,\r\n        \"deductible\": 5000.00,\r\n        \"premium\": \"12000.00\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/products-api/1.0/product/P_003",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"products-api",
+						"1.0",
+						"product",
+						"P_003"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

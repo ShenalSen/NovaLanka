@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "1b139ec5-759d-4bbf-b9b2-34b65263b751",
+		"name": "Insurance-Products",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/DataService-MI~76a70266-115f-4bf4-9b6d-4bf9cb266488/collection/42569940-1b139ec5-759d-4bbf-b9b2-34b65263b751?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Products",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceProductsService/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceProductsService",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get A Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceProductsService/product/P_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceProductsService",
+						"product",
+						"P_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete by Id",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceProductsService/product/P_008",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceProductsService",
+						"product",
+						"P_008"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert a new product",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Insert New Product\": {\r\n        \"name\": \"Auto Insurance\",\r\n        \"description\": \"Covers all vehicle-related damages including theft and accidents\",\r\n        \"coverage_type\": \"Auto\",\r\n        \"coverage_amount\": 1000000.00,\r\n        \"deductible\": 5000.00,\r\n        \"premium\": \"12000.00\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceProductsService/product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceProductsService",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Insert New Product\": {\r\n        \"product_id\": \"P_003\",\r\n        \"name\": \" Insurance\",\r\n        \"description\": \"Covers all vehicle-related damages including theft and accidents\",\r\n        \"coverage_type\": \"Auto\",\r\n        \"coverage_amount\": 1000000.00,\r\n        \"deductible\": 5000.00,\r\n        \"premium\": \"12000.00\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceProductsService/product/P_003",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceProductsService",
+						"product",
+						"P_003"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

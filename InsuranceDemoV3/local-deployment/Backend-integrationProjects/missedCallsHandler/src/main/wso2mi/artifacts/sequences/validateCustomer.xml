@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="validateCustomer" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Bridge the variable to a property for dataServiceCall parameter compatibility -->
+    <property name="mobileNo" expression="${vars.mobileNo}" scope="default"/>
+    <!-- Get customer by mobile number -->
+    <dataServiceCall serviceName="InsuranceDataBase">
+        <source type="inline"/>
+        <operations type="single">
+            <operation name="getClientByMobile">
+                <param name="phone" expression="get-property('mobileNo')"/>
+            </operation>
+        </operations>
+        <target type="body"/>
+    </dataServiceCall>
+    <!-- Check customer existence -->
+    <filter xpath="${exists(payload.customers.customer)}">
+        <then>
+            <variable name="customerId" expression="${payload.customers.customer.customer_id}" type="STRING"/>
+            <log category="INFO">
+                <message>Customer found - ID: ${vars.customerId}.</message>
+            </log>
+            <!-- Fetch customer email by customer ID -->
+            <property name="customerId" expression="${vars.customerId}" scope="default"/>
+            <dataServiceCall serviceName="InsuranceDataBase">
+                <source type="inline"/>
+                <operations type="single">
+                    <operation name="getEmailByCustomerId">
+                        <param name="customer_id" expression="get-property('customerId')"/>
+                    </operation>
+                </operations>
+                <target type="body"/>
+            </dataServiceCall>
+            <variable name="emailTo" expression="${payload.customer_email.email}" type="STRING"/>
+            <log category="INFO">
+                <message>Customer email: ${vars.emailTo}</message>
+            </log>
+        </then>
+        <else>
+            <!-- Log a warning and return an error response when the mobile number is not registered -->
+            <log category="WARN">
+                <message>Mobile number not registered: ${vars.mobileNo}.</message>
+            </log>
+            <property name="HTTP_SC" value="404" scope="axis2" type="STRING"/>
+            <payloadFactory media-type="json" template-type="default">
+                <format>{
+                    "status": "user not found",
+                    "message": "Please register for this service by dialing 07******** or visit the nearest branch."
+                    }</format>
+            </payloadFactory>
+            <respond/>
+        </else>
+    </filter>
+</sequence>

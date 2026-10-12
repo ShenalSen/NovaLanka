@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/missed-calls/v1" name="MissedCallsAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/notifications">
+        <inSequence>
+            <variable name="mobileNo" expression="${payload.mobileNo}" type="STRING"/>
+            <log category="INFO">
+                <message>Missed call received from: ${vars.mobileNo}.</message>
+            </log>
+            <!-- Validate customer by mobile number -->
+            <sequence key="validateCustomer"/>
+            <!-- Fetch and validate active policies -->
+            <sequence key="fetchAndValidatePolicies"/>
+            <!-- For each policy, retrieve the latest payment and build the payment message -->
+            <foreach collection="${payload.policies.policy}" parallel-execution="false" update-original="false" target-variable="messages" result-content-type="JSON" continue-without-aggregation="false">
+                <sequence>
+                    <sequence key="buildPolicyPaymentMessage"/>
+                </sequence>
+            </foreach>
+            <!-- Build final success response -->
+            <payloadFactory media-type="json">
+                <format>{"messages": ${vars.messages}}</format>
+            </payloadFactory>
+            <!-- Build HTML formatted email body -->
+            <payloadFactory media-type="json" template-type="freemarker">
+                <format key="emailTemplate"/>
+            </payloadFactory>
+            <sequence key="sendNotificationEmail"/>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>Error in MissedCallHandlerAPI: ${props.synapse.ERROR_MESSAGE}.</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>
+                    {
+                    "status": "error",
+                    "message": "An unexpected error occurred while processing the request."
+                    }
+                </format>
+            </payloadFactory>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>

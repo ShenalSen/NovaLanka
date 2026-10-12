@@ -1,0 +1,130 @@
+openapi: 3.0.1
+info:
+  title: policy-validation-api
+  description: API Definition of policy-validation-api
+  version: 1.0.0
+servers:
+  - url: http://localhost:8290/policy/v1
+  - url: https://localhost:8253/policy/v1
+security:
+  - default: []
+paths:
+  /status/{policy_id}:
+    get:
+      summary: Validate a policy ID.
+      operationId: validatePolicy
+      parameters:
+        - name: policy_id
+          in: path
+          required: true
+          description: The policy identifier to validate.
+          schema:
+            type: string
+            example: POL_001
+      responses:
+        "200":
+          description: Policy validation result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: integer
+                    description: "1 if policy is active and valid, 0 if not."
+                    enum:
+                      - 0
+                      - 1
+                  policy_id:
+                    type: string
+                  message:
+                    type: string
+        "404":
+          description: policy_id not provided in the URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+        "503":
+          description: Service temporarily unavailable. (data sync in progress)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - "*"
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - http://localhost:8290/policy/v1
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - http://localhost:8290/policy/v1
+  type: http
+x-wso2-basePath: /policy-validation-api/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

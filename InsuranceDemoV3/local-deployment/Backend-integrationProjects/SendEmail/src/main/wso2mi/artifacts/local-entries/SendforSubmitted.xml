@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="SendforSubmitted" xmlns="http://ws.apache.org/ns/synapse">
+    <email.init>
+        <connectionType>SMTPS</connectionType>
+        <host>smtp.gmail.com</host>
+        <port>465</port>
+        <username>insurancecompany413@gmail.com</username>
+        <password>hfzj rnmz ahuz onag</password>
+        <name>SendforSubmitted</name>
+    </email.init>
+</localEntry>

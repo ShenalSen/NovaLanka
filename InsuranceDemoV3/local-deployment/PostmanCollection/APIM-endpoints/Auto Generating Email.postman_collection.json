@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "22bddc59-c3ce-4c92-a434-894f0ca65bba",
+		"name": "Auto Generating Email",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-22bddc59-c3ce-4c92-a434-894f0ca65bba?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Claim Submission ",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"from\": \"insurancecompany413@gmail.com\",\r\n  \"to\": \"divi8330@gmail.com\",\r\n  \"subject\": \"Claim Submission Confirmation\",\r\n  \"content\": \"<p>Dear Valued Customer,</p>\\n<p>Thank you for submitting your insurance claim. We have successfully received your claim and it is currently being reviewed by our processing team.</p>\\n<p><strong>Your claim reference number is:</strong> [CLAIM_ID]</p>\\n<p>Our team will assess the information provided and contact you if any additional details are required. You will receive an update regarding the status of your claim within the next few business days.</p>\\n<p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team at <a href=\\\"mailto:support@novalanka.lk\\\">support@novalanka.lk</a> or call us at +94 77 123 4567.</p>\\n<p>Thank you for choosing our insurance services.</p>\\n<p>Best regards,<br>Customer Service Team<br><strong>NOVA Lanka Pvt (Ltd)</strong><br>No. 123, Galle Road, Colombo 03, Sri Lanka</p>\",\r\n  \"contentType\": \"text/html\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/email-api/1.0/send",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"email-api",
+						"1.0",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Claim closed",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"from\": \"insurancecompany413@gmail.com\",\r\n  \"to\": \"divi8330@gmail.com\",\r\n  \"subject\": \"Claim Completed – [DATE]\",\r\n  \"content\": \"<p>Dear Valued Customer,</p>\\n\\n<p>We are writing to inform you that your insurance claim has been successfully processed and is now closed.</p>\\n\\n<p><strong>Claim Reference Number:</strong> [CLAIM_ID]</p>\\n<p><strong>Date of Completion:</strong> [DATE]</p>\\n\\n<p>If you have any questions regarding the claim decision or require any additional documentation, please feel free to contact our support team.</p>\\n\\n<p>You can reach us at <a href=\\\"mailto:support@novalanka.lk\\\">support@novalanka.lk</a> or call +94 77 123 4567 during our business hours.</p>\\n\\n<p>Thank you for trusting NOVA Lanka Pvt (Ltd) with your insurance needs.</p>\\n\\n<p>Best regards,<br>\\nCustomer Service Team<br>\\n<strong>NOVA Lanka Pvt (Ltd)</strong><br>\\nNo. 123, Galle Road, Colombo 03, Sri Lanka</p>\",\r\n  \"contentType\": \"text/html\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/email-api/1.0/send",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"email-api",
+						"1.0",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Claim declined",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"from\": \"insurancecompany413@gmail.com\",\r\n  \"to\": \"divi8330@gmail.com\",\r\n  \"subject\": \"Claim Decision Notification – [DATE]\",\r\n  \"content\": \"<p>Dear Valued Customer,</p>\\n\\n<p>We regret to inform you that after a thorough review, your insurance claim with the reference number <strong>[CLAIM_ID]</strong> has been declined.</p>\\n\\n<p>The decision was made based on the assessment of the provided information and in accordance with the terms and conditions of your policy.</p>\\n\\n<p>If you believe this decision was made in error or if you require further clarification, you are welcome to contact our support team. We are here to assist you and address any concerns you may have.</p>\\n\\n<p><strong>Contact us:</strong><br>\\nEmail: <a href=\\\"mailto:support@novalanka.lk\\\">support@novalanka.lk</a><br>\\nPhone: +94 77 123 4567</p>\\n\\n<p>We appreciate your understanding and thank you for trusting NOVA Lanka Pvt (Ltd).</p>\\n\\n<p>Best regards,<br>\\nClaims Department<br>\\n<strong>NOVA Lanka Pvt (Ltd)</strong><br>\\nNo. 123, Galle Road, Colombo 03, Sri Lanka</p>\",\r\n  \"contentType\": \"text/html\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/email-api/1.0/send",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"email-api",
+						"1.0",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apply for a policy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"from\": \"insurancecompany413@gmail.com\",\r\n  \"to\": \"insurancecompany413@gmail.com\",\r\n  \"subject\": \"Customer New Policy Application – [CUSTOMER_ID]\",\r\n  \"content\": \"<p>Dear Admin,</p>\\n\\n<p>This is to inform you that the customer <strong>[CUSTOMER_NAME]</strong> (Customer ID: <strong>[CUSTOMER_ID]</strong>) has requested to apply for a new insurance policy.</p>\\n\\n<p>Please take the necessary actions to guide the customer through the policy application process and ensure all required documentation is collected.</p>\\n\\n<p><strong>Customer Details:</strong><br>\\nEmail: <a href=\\\"mailto:[CUSTOMER_EMAIL]\\\">[CUSTOMER_EMAIL]</a><br>\\nPhone: [CUSTOMER_PHONE]</p>\\n\\n<p>Best regards,<br>\\nCustomer Support Team<br>\\n<strong>NOVA Lanka Pvt (Ltd)</strong><br>\\nNo. 123, Galle Road, Colombo 03, Sri Lanka<br>\\nPhone: +94 77 123 4567</p>\",\r\n  \"contentType\": \"text/html\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/email-api/1.0/send",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"email-api",
+						"1.0",
+						"send"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

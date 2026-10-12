@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="SendRenewalReminderSeq" onError="RenewalReminderFaultSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Capture per-policy fields into variables before payloadFactory overwrites payload -->
+    <variable name="reminderEmailTo" type="STRING" expression="${payload.email}"/>
+    <variable name="reminderPolicyId" type="STRING" expression="${payload.policy_id}"/>
+    <variable name="reminderDaysLeft" type="STRING" expression="${string(payload.days_left)}"/>
+    <variable name="reminderEmailSubject" type="STRING" expression="${'[Action Required] Your Policy ' + payload.policy_id + ' Expires in ' + string(payload.days_left) + ' Day(s) - Renew Now'}"/>
+    <variable name="reminderRenewUrl" type="STRING" expression="${vars.frontendUrl + '?renewPolicy=' + payload.policy_id}"/>
+    <log category="INFO">
+        <message>Sending renewal reminder to ${vars.reminderEmailTo} for policy ${vars.reminderPolicyId} expiring in ${vars.reminderDaysLeft} days</message>
+    </log>
+    <!-- Build branded HTML reminder email using FreeMarker (no script mediator) -->
+    <payloadFactory media-type="text" template-type="freemarker">
+        <format><![CDATA[<html>
+<body style="font-family:Arial,sans-serif;color:#1f2937;line-height:1.7;max-width:600px;margin:auto;padding:24px;">
+<div style="background:#1e3a5f;padding:20px 24px;border-radius:8px 8px 0 0;">
+<h2 style="color:#ffffff;margin:0;">NOVA Lanka Insurance</h2>
+</div>
+<div style="background:#f9fafb;padding:28px 24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;">
+<p>Dear ${payload.first_name} ${payload.last_name},</p>
+<p>This is a friendly reminder that your insurance policy <strong>${payload.policy_id}</strong>
+is expiring on <strong>${payload.end_date}</strong> &mdash; only <strong>${payload.days_left} day(s)</strong> remaining.</p>
+<p>To keep your coverage active without any gap in protection, please renew before the expiry date by logging into your account.</p>
+<div style="text-align:center;margin:32px 0;">
+<a href="${vars.reminderRenewUrl}" style="background:#1e3a5f;color:#ffffff;padding:14px 32px;text-decoration:none;border-radius:6px;font-weight:bold;font-size:15px;">Renew My Policy</a>
+</div>
+<p style="font-size:13px;color:#6b7280;">If you have already renewed your policy or no longer wish to continue, you may safely ignore this reminder.</p>
+<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;"/>
+<p style="font-size:13px;">Need help? Contact us:<br/>
+Email: <a href="mailto:support@novalanka.lk">support@novalanka.lk</a><br/>
+Phone: +94 77 123 4567</p>
+<p style="font-size:13px;color:#6b7280;">Best regards,<br/>
+<strong>NOVA Lanka Pvt (Ltd)</strong><br/>
+No. 123, Galle Road, Colombo 03, Sri Lanka</p>
+</div>
+</body></html>]]></format>
+    </payloadFactory>
+    <variable name="reminderEmailBody" type="STRING" expression="${payload.text}"/>
+    <!-- Send the reminder email -->
+    <email.send configKey="gmailConn">
+        <from>{${configs.email_from}}</from>
+        <personalName>NOVA Lanka Insurance</personalName>
+        <to>{${vars.reminderEmailTo}}</to>
+        <subject>{${vars.reminderEmailSubject}}</subject>
+        <content>{${vars.reminderEmailBody}}</content>
+        <contentType>text/html</contentType>
+        <encoding>UTF-8</encoding>
+        <responseVariable>emailSendResult</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </email.send>
+    <log category="INFO">
+        <message>Reminder email sent to ${vars.reminderEmailTo} for policy ${vars.reminderPolicyId}</message>
+    </log>
+</sequence>

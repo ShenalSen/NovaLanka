@@ -1,0 +1,119 @@
+openapi: 3.0.1
+info:
+  title: ChatbotAPI
+  version: 1.0.0
+servers:
+  - url: "http://localhost:9090/customerSupportInsuranceAssistant/chat"
+security:
+  - default: []
+paths:
+  /:
+    post:
+      summary: Send a chat message to Nova the insurance assistant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - message
+                - sessionId
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+                  example: e5e8aaa4-dfe0-43be-9576-5f4dff98c97b
+                message:
+                  type: string
+                  example: Hi
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: >-
+                      Hello! How can I assist you with your insurance needs
+                      today?
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: >-
+                      Unable to process the request due to an unrecognized
+                      format.
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - api_key
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: "https://test.com"
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - "*"
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - "http://localhost:9090/customerSupportInsuranceAssistant/chat"
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - "http://localhost:9090/customerSupportInsuranceAssistant/chat"
+  type: http
+x-wso2-basePath: /chatbotapi/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - api_key
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

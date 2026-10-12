@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api xmlns="http://ws.apache.org/ns/synapse" name="PaymentsAPI" context="/payments/v1">
+
+    <!-- POST /payment : Create a new payment -->
+    <resource methods="POST" uri-template="/">
+        <inSequence>
+            <!-- Validate the payment request -->
+            <sequence key="PaymentValidationSeq"/>
+            <!-- Define the payment properties -->
+            <sequence key="PaymentPropertyBridgeSeq"/>
+            <!-- Create the payment record -->
+            <sequence key="PaymentInsertSeq"/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>POST /payments error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error.", "message": "Please try again later."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+
+    <!-- GET /payments : Returns all payments -->
+    <resource methods="GET" uri-template="/">
+        <inSequence>
+
+            <dataServiceCall serviceName="InsurancePaymentsService">
+                <source type="inline"/>
+                <operations type="single">
+                    <operation name="getAllPaymentsOp"/>
+                </operations>
+                <target type="body"/>
+            </dataServiceCall>
+            <property name="messageType" value="application/json" scope="axis2"/>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message></message>
+            </log>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>GET /payments error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error.", "message": "Please try again later."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+
+    <!-- GET /payments/id/{paymentId} : Returns a single payment by payment_id -->
+    <resource methods="GET" uri-template="/id/{paymentId}">
+        <inSequence>
+
+            <property name="paymentId" expression="${params.pathParams.paymentId}" scope="default"/>
+            <dataServiceCall serviceName="InsurancePaymentsService">
+                <source type="inline"/>
+                <operations type="single">
+                    <operation name="getPaymentByIdOp">
+                        <param name="payment_id" expression="get-property('paymentId')"/>
+                    </operation>
+                </operations>
+                <target type="body"/>
+            </dataServiceCall>
+            <property name="messageType" value="application/json" scope="axis2"/>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message></message>
+            </log>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>GET /payments/id/{paymentId} error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error.", "message": "Please try again later."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+
+    <!-- GET /payments/{policyId} : Returns all payments for the given policy -->
+    <resource methods="GET" uri-template="/{policyId}">
+        <inSequence>
+
+            <property name="policyId" expression="${params.pathParams.policyId}" scope="default"/>
+            <dataServiceCall serviceName="InsurancePaymentsService">
+                <source type="inline"/>
+                <operations type="single">
+                    <operation name="getPaymentsByPolicyIdOp">
+                        <param name="policy_id" expression="get-property('policyId')"/>
+                    </operation>
+                </operations>
+                <target type="body"/>
+            </dataServiceCall>
+            <property name="messageType" value="application/json" scope="axis2"/>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message></message> 
+            </log>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>GET /payments/{policyId} error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error.", "message": "Please try again later."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+
+</api>

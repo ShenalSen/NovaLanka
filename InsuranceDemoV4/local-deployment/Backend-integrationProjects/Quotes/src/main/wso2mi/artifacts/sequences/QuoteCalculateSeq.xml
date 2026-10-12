@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="QuoteCalculateSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Lookup product base rate from products table -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insurance</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql>SELECT base_rate FROM products WHERE product_id = ?</sql>
+            <parameter expression="${vars.productId}" type="VARCHAR"/>
+            <result name="baseRate" column="base_rate"/>
+        </statement>
+    </dblookup>
+    <!-- If product not exists, respond with "404 - Product not found." -->
+    <filter xpath="${not(exists(properties.synapse.baseRate))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Product not found.", "product_id": "${vars.productId}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="404" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="true">
+                <message>Product base rate retrieved successfully.</message>
+            </log>
+        </else>
+    </filter>
+    <!-- Pricing constants -->
+    <variable name="baselineAge" type="INTEGER" value="18"/>
+    <variable name="ageUpliftRate" type="DOUBLE" value="0.02"/>
+    <variable name="baseAgeFactor" type="DOUBLE" value="1.0"/>
+    <!-- Frequency factors -->
+    <variable name="quote_frequency_monthly" type="DOUBLE" value="0.0833"/>
+    <variable name="quote_frequency_quarterly" type="DOUBLE" value="0.25"/>
+    <variable name="quote_frequency_semi_annual" type="DOUBLE" value="0.5"/>
+    <variable name="quote_frequency_annual" type="DOUBLE" value="1.0"/>
+    <!-- Calculate premium
+         Formula : base_rate * (sum_assured / sum_divisor) * term_years * age_factor
+         age_factor = 1 + (age - baseline_age) * age_uplift_rate -->
+    <variable name="baseRate" type="DOUBLE" expression="${float(properties.synapse.baseRate)}"/>
+    <variable name="ageFactor" type="DOUBLE" expression="${vars.baseAgeFactor + (vars.age - vars.baselineAge) * vars.ageUpliftRate}"/>
+    <variable name="basePremium" type="DOUBLE" expression="${vars.baseRate * (vars.sumAssured / vars.sumDivisor) * vars.termYears * vars.ageFactor}"/>
+    <!-- Per-period premium based on payment frequency -->
+    <variable name="frequencyFactor" type="DOUBLE" value="1.0"/>
+    <switch source="${vars.frequency}">
+        <case regex="MONTHLY">
+            <variable name="frequencyFactor" type="DOUBLE" expression="${vars.quote_frequency_monthly}"/>
+        </case>
+        <case regex="QUARTERLY">
+            <variable name="frequencyFactor" type="DOUBLE" expression="${vars.quote_frequency_quarterly}"/>
+        </case>
+        <case regex="SEMI_ANNUAL">
+            <variable name="frequencyFactor" type="DOUBLE" expression="${vars.quote_frequency_semi_annual}"/>
+        </case>
+        <default>
+            <variable name="frequencyFactor" type="DOUBLE" expression="${vars.quote_frequency_annual}"/>
+        </default>
+    </switch>
+    <variable name="totalPremium" type="DOUBLE" expression="${vars.basePremium * vars.frequencyFactor}"/>
+</sequence>

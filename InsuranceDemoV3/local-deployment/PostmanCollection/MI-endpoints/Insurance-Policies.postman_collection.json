@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "1d689cd9-11a1-47c2-837e-306e72c41916",
+		"name": "Insurance-Policies",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/DataService-MI~76a70266-115f-4bf4-9b6d-4bf9cb266488/collection/42569940-1d689cd9-11a1-47c2-837e-306e72c41916?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Policies",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policies",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Policy by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policy/POL_002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policy",
+						"POL_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Policy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Create a policy\": {\r\n        \"customer_id\": \"C_002\",\r\n        \"product_id\": \"P_001\",\r\n        \"employee_id\": \"E_001\",\r\n        \"start_date\": \"2025-04-28\",\r\n        \"end_date\": \"2026-04-28\",\r\n        \"status\": \"Active\",\r\n        \"policy_details\": \"This is a sample insurance policy for testing purposes.\"\r\n    }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policy",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Policy",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Update a policy\": {\r\n        \"policy_id\": \"POL_007\",\r\n        \"customer_id\": \"C_002\",\r\n        \"product_id\": \"P_001\",\r\n        \"employee_id\": \"E_001\",\r\n        \"start_date\": \"2025-04-28\",\r\n        \"end_date\": \"2026-04-28\",\r\n        \"status\": \"Active\",\r\n        \"policy_details\": \"huiohi\"\r\n    }\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policy/POL_007",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policy",
+						"POL_007"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Policy",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policy/POL_010",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policy",
+						"POL_010"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "policy by customerID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policies/customer/C_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policies",
+						"customer",
+						"C_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total policies",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policies/count",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policies",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total policies by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policies/count/employee/E_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policies",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get policies by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/policies/employee/E_002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"policies",
+						"employee",
+						"E_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get customer count by Employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsurancePoliciesService/customers/count/employee/E_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsurancePoliciesService",
+						"customers",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

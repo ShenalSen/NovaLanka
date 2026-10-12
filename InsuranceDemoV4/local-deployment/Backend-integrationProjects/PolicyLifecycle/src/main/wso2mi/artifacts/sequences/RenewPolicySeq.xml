@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="RenewPolicySeq" xmlns="http://ws.apache.org/ns/synapse">
+
+    <!-- Extract request inputs -->
+    <variable name="renewPolicyId"    type="STRING"  expression="${params.pathParams.policy_id}"/>
+    <variable name="renewTermYears"   type="INTEGER" expression="${payload.term_years}"/>
+    <variable name="renewFirstName"   type="STRING"  expression="${payload.payment_details.first_name}"/>
+    <variable name="renewLastName"    type="STRING"  expression="${payload.payment_details.last_name}"/>
+    <variable name="renewNic"         type="STRING"  expression="${payload.payment_details.nic_number}"/>
+    <variable name="renewEmail"       type="STRING"  expression="${payload.payment_details.email}"/>
+    <variable name="renewMobile"      type="STRING"  expression="${payload.payment_details.mobile_number}"/>
+    <variable name="renewAddress"     type="STRING"  expression="${payload.payment_details.address}"/>
+    <variable name="renewPayMethod"   type="STRING"  expression="${payload.payment_details.payment_method}"/>
+
+    <log category="INFO">
+        <message>RenewPolicySeq: Starting renewal for policy ${vars.renewPolicyId}, term_years=${vars.renewTermYears}</message>
+    </log>
+
+    <!-- Validate policy exists, is Active, and has a customer -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insuranceDS</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[
+                SELECT p.policy_id, p.status, p.customer_id, p.end_date,
+                       p.premium_amount, p.product_id
+                FROM policies p
+                WHERE p.policy_id = ?
+                  AND p.status = 'Active'
+                  AND p.customer_id IS NOT NULL
+            ]]></sql>
+            <parameter expression="${vars.renewPolicyId}" type="VARCHAR"/>
+            <result column="policy_id"       name="db_policy_id"/>
+            <result column="status"          name="db_policy_status"/>
+            <result column="customer_id"     name="db_customer_id"/>
+            <result column="end_date"        name="db_end_date"/>
+            <result column="premium_amount"  name="db_premium_amount"/>
+            <result column="product_id"      name="db_product_id"/>
+        </statement>
+    </dblookup>
+
+    <variable name="dbPolicyId"      type="STRING" expression="${properties.synapse.db_policy_id}"/>
+    <variable name="dbPremiumAmount" type="STRING" expression="${properties.synapse.db_premium_amount}"/>
+    <variable name="dbCustomerId"    type="STRING" expression="${properties.synapse.db_customer_id}"/>
+    <variable name="dbCurrentEndDate" type="STRING" expression="${properties.synapse.db_end_date}"/>
+
+    <!-- Guard: policy not found or not eligible for renewal -->
+    <filter xpath="${not(exists(vars.dbPolicyId)) or (vars.dbPolicyId == '')}">
+        <then>
+            <log category="WARN">
+                <message>RenewPolicySeq: Policy ${vars.renewPolicyId} not found, not Active, or has no registered customer</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Policy not eligible for renewal", "policy_id": "${vars.renewPolicyId}", "reason": "Policy must be Active and linked to a registered customer"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="404" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="true">
+                <message>RenewPolicySeq: Policy ${vars.renewPolicyId} is eligible for renewal. Current end_date=${vars.dbCurrentEndDate}, premium_amount=${vars.dbPremiumAmount}</message>
+            </log>
+        </else>   
+    </filter>
+
+    <!-- Call Payments API -->
+    <log category="INFO">
+        <message>RenewPolicySeq: Processing payment for policy ${vars.renewPolicyId}, amount=${vars.dbPremiumAmount}</message>
+    </log>
+    <payloadFactory media-type="json">
+        <format>{
+            "policy_id":      "${vars.renewPolicyId}",
+            "customer_id":    "${vars.dbCustomerId}",
+            "first_name":     "${vars.renewFirstName}",
+            "last_name":      "${vars.renewLastName}",
+            "nic_number":     "${vars.renewNic}",
+            "email":          "${vars.renewEmail}",
+            "mobile_number":  "${vars.renewMobile}",
+            "address":        "${vars.renewAddress}",
+            "amount":         ${vars.dbPremiumAmount},
+            "tran_date":      "${vars.dbCurrentEndDate}",
+            "payment_method": "${vars.renewPayMethod}",
+            "status":         "Success"
+        }</format>
+    </payloadFactory>
+    <http.post configKey="ApiGateway">
+        <relativePath>/payments-api/1.0.0/</relativePath>
+        <headers>[{"Content-Type":"application/json"},{"accept":"*/*"}]</headers>
+        <requestBodyJson>${payload}</requestBodyJson>
+        <responseVariable>renewPaymentResponse</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </http.post>
+
+    <variable name="renewPaymentId"     type="STRING" expression="${vars.renewPaymentResponse.payload.payment_id}"/>
+    <variable name="renewPaymentStatus" type="STRING" expression="${vars.renewPaymentResponse.payload.status}"/>
+
+    <log category="INFO">
+        <message>RenewPolicySeq: Payment result — id=${vars.renewPaymentId}, status=${vars.renewPaymentStatus}</message>
+    </log>
+
+    <!-- Guard: payment failed -->
+    <filter xpath="${not((vars.renewPaymentStatus == 'success') or (vars.renewPaymentStatus == 'Success'))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Payment was not successful. Policy renewal aborted.", "policy_id": "${vars.renewPolicyId}", "payment_id": "${vars.renewPaymentId}", "payment_status": "${vars.renewPaymentStatus}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="402" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO">
+                <message>RenewPolicySeq: Payment successful for policy ${vars.renewPolicyId}</message>
+            </log>
+        </else>
+    </filter>
+
+    <!-- Extend policy end_date by term_years -->
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDS</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[UPDATE policies SET end_date = DATE_ADD(end_date, INTERVAL ? YEAR) WHERE policy_id = ?]]></sql>
+            <parameter expression="${vars.renewTermYears}" type="INTEGER"/>
+            <parameter expression="${vars.renewPolicyId}"  type="VARCHAR"/>
+        </statement>
+    </dbreport>
+
+    <log category="INFO">
+        <message>RenewPolicySeq: Policy ${vars.renewPolicyId} end_date extended by ${vars.renewTermYears} year(s)</message>
+    </log>
+
+    <!-- Fetch updated policy details --> 
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insuranceDS</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[
+                SELECT p.policy_id, p.customer_id, p.product_id, p.status,
+                       DATE_FORMAT(p.start_date, '%Y-%m-%d') AS start_date,
+                       DATE_FORMAT(p.end_date,   '%Y-%m-%d') AS new_end_date,
+                       p.premium_amount, p.policy_details
+                FROM policies p
+                WHERE p.policy_id = ?
+            ]]></sql>
+            <parameter expression="${vars.renewPolicyId}" type="VARCHAR"/>
+            <result column="policy_id"      name="upd_policy_id"/>
+            <result column="customer_id"    name="upd_customer_id"/>
+            <result column="product_id"     name="upd_product_id"/>
+            <result column="status"         name="upd_status"/>
+            <result column="start_date"     name="upd_start_date"/>
+            <result column="new_end_date"   name="upd_new_end_date"/>
+            <result column="premium_amount" name="upd_premium_amount"/>
+            <result column="policy_details" name="upd_policy_details"/>
+        </statement>
+    </dblookup>
+
+    <!-- Send policy statement email -->
+    <variable name="stmt_policy_id"      type="STRING" expression="${properties.synapse.upd_policy_id}"/>
+    <variable name="stmt_first_name"     type="STRING" expression="${vars.renewFirstName}"/>
+    <variable name="stmt_last_name"      type="STRING" expression="${vars.renewLastName}"/>
+    <variable name="stmt_email"          type="STRING" expression="${vars.renewEmail}"/>
+    <variable name="stmt_product_id"     type="STRING" expression="${properties.synapse.upd_product_id}"/>
+    <variable name="stmt_start_date"     type="STRING" expression="${properties.synapse.upd_start_date}"/>
+    <variable name="stmt_end_date"       type="STRING" expression="${properties.synapse.upd_new_end_date}"/>
+    <variable name="stmt_premium_amount" type="STRING" expression="${vars.dbPremiumAmount}"/>
+    <variable name="stmt_payment_id"     type="STRING" expression="${vars.renewPaymentId}"/>
+    <variable name="stmt_policy_details" type="STRING" expression="${properties.synapse.upd_policy_details}"/>
+    <variable name="stmt_payment_method" type="STRING" expression="${vars.renewPayMethod}"/>
+    <variable name="stmt_type"           type="STRING" value="RENEWAL"/>
+    <sequence key="PolicyStatementSeq"/>
+
+    <!-- Return success response -->
+    <payloadFactory media-type="json">
+        <format>{
+            "message":        "Policy renewed successfully",
+            "policy_id":      "${properties.synapse.upd_policy_id}",
+            "customer_id":    "${properties.synapse.upd_customer_id}",
+            "product_id":     "${properties.synapse.upd_product_id}",
+            "status":         "${properties.synapse.upd_status}",
+            "start_date":     "${properties.synapse.upd_start_date}",
+            "new_end_date":   "${properties.synapse.upd_new_end_date}",
+            "premium_amount": ${vars.dbPremiumAmount},
+            "term_years_added": ${vars.renewTermYears},
+            "payment_id":     "${vars.renewPaymentId}",
+            "policy_details": "${properties.synapse.upd_policy_details}"
+        }</format>
+    </payloadFactory>
+    <property name="HTTP_SC" value="200" scope="axis2" type="INTEGER"/>
+    <respond/>
+
+</sequence>

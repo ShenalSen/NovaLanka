@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="RenewalReminderFaultSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Log the failure and continue — forEach will proceed to the next policy -->
+    <log category="WARN">
+        <message>SendRenewalReminderSeq: Failed to send reminder email for policy ${vars.reminderPolicyId} to ${vars.reminderEmailTo} — ${properties.synapse.ERROR_MESSAGE}. Skipping to next policy.</message>
+    </log>
+</sequence>

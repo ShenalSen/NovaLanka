@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="ActivatePolicySeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Activate policy only if payment succeeded -->
+    <filter xpath="${vars.paymentStatus == 'success'}">
+        <then>
+            <log category="INFO">
+                <message>Activating policy: ${vars.policyId}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{
+                    "Update a policy": {
+                    "policy_id": "${vars.policyId}",
+                    "status": "Active",
+                    "next_due_date": "${vars.nextDueDate}"
+                    }
+                    }</format>
+            </payloadFactory>
+            <http.patch configKey="ApiGateway">
+                <relativePath>/policies-api/1.0/policy/${vars.policyId}</relativePath>
+                <headers>[{"Content-Type":"application/json"},{"accept":"*/*"}]</headers>
+                <requestBodyJson>${payload}</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <responseVariable>activatePolicyResponse</responseVariable>
+                <overwriteBody>false</overwriteBody>
+            </http.patch>
+            <log category="INFO">
+                <message>Policy activated. Status: ${vars.activatePolicyResponse.attributes.statusCode}</message>
+            </log>
+            <!-- Mark the quote as Bought so it cannot be reused -->
+            <payloadFactory media-type="json">
+                <format>{"status": "Bought"}</format>
+            </payloadFactory>
+            <http.patch configKey="ApiGateway">
+                <relativePath>/quotes-api/1.0.0/quote/${vars.quoteId}</relativePath>
+                <headers>[{"Content-Type":"application/json"},{"accept":"*/*"}]</headers>
+                <requestBodyJson>${payload}</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <responseVariable>markBoughtResponse</responseVariable>
+                <overwriteBody>false</overwriteBody>
+            </http.patch>
+            <log category="INFO">
+                <message>Quote ${vars.quoteId} marked as Bought. Status: ${vars.markBoughtResponse.attributes.statusCode}</message>
+            </log>
+            <!-- Send policy statement email -->
+            <variable name="stmt_policy_id" type="STRING" expression="${vars.policyId}"/>
+            <variable name="stmt_first_name" type="STRING" expression="${vars.firstName}"/>
+            <variable name="stmt_last_name" type="STRING" expression="${vars.lastName}"/>
+            <variable name="stmt_email" type="STRING" expression="${vars.email}"/>
+            <variable name="stmt_product_id" type="STRING" expression="${vars.productId}"/>
+            <variable name="stmt_start_date" type="STRING" expression="${vars.startDate}"/>
+            <variable name="stmt_end_date" type="STRING" expression="${vars.endDate}"/>
+            <variable name="stmt_premium_amount" type="STRING" expression="${string(vars.totalPremium)}"/>
+            <variable name="stmt_payment_id" type="STRING" expression="${vars.paymentId}"/>
+            <variable name="stmt_policy_details" type="STRING" expression="${vars.policyDesc}"/>
+            <variable name="stmt_payment_method" type="STRING" expression="${vars.paymentMethod}"/>
+            <variable name="stmt_type" type="STRING" value="PURCHASE"/>
+            <sequence key="PolicyStatementSeq"/>
+            <payloadFactory media-type="json">
+                <format>{
+                    "policy_id": "${vars.policyId}",
+                    "policy_status": "Active",
+                    "payment_id": "${vars.paymentId}",
+                    "next_due_date": "${vars.nextDueDate}",
+                    "payment_time": "${vars.tranDate}",
+                    "payment_status": "success"
+                    }</format>
+            </payloadFactory>
+            <respond/>
+        </then>
+        <else>
+            <log category="WARN">
+                <message>Payment failed for policy ${vars.policyId}. Payment status: ${vars.paymentStatus}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{
+                    "error": "Payment was not successful. Policy remains inactive.",
+                    "policy_id": "${vars.policyId}",
+                    "payment_id": "${vars.paymentId}",
+                    "payment_status": "${vars.paymentStatus}"
+                    }</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="402" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </else>
+    </filter>
+</sequence>

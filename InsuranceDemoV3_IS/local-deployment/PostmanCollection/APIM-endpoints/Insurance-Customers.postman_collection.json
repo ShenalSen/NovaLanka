@@ -1,0 +1,213 @@
+{
+	"info": {
+		"_postman_id": "1e669b14-4d04-4eba-9f68-e1260a8d3302",
+		"name": "Insurance-Customers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-1e669b14-4d04-4eba-9f68-e1260a8d3302?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Customers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customers",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Customer",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer\": {\n        \"customer_id\": \"C_002\",\n        \"first_name\": \"Divya\",\n        \"last_name\": \"Perera\",\n        \"dob\": \"1992-05-12\",\n        \"gender\": \"Female\",\n        \"email\": \"nadeesha.perea@example.com\",\n        \"phone\": \"0772223344\",\n        \"address\": \"No. 45, Green Lane, Negombo\",\n        \"status\": \"inactive\"\n    }\n}"
+				},
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customer/C_002",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customer",
+						"C_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer\": {\n        \"first_name\": \"Nadeesha\",\n        \"last_name\": \"Perera\",\n        \"dob\": \"1992-05-12\",\n        \"gender\": \"Female\",\n        \"email\": \"ui.perra@exaple.com\",\n        \"phone\": \"0772223344\",\n        \"address\": \"No. 45, Green Lane, Negombo\",\n        \"status\": \"inactive\"\n    }\n}"
+				},
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customer",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customer/C_006",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customer",
+						"C_006"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customer/C_002",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customer",
+						"C_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total customers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customers/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customers",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customer Details by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/customer-api/1.0/customers/byemployee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"customer-api",
+						"1.0",
+						"customers",
+						"byemployee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "CUST123456"
+		}
+	]
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="CreatePolicySeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Create a new policy in Inactive state -->
+    <log category="INFO">
+        <message>Creating inactive policy for product: ${vars.productId}</message>
+    </log>
+    <payloadFactory media-type="json">
+        <format>{
+            "Create a policy": {
+            "product_id": "${vars.productId}",
+            "start_date": "${vars.startDate}",
+            "end_date": "${vars.endDate}",
+            "next_due_date": "${vars.nextDueDate}",
+            "premium_amount": ${vars.totalPremium},
+            "status": "Inactive",
+            "policy_details": "${vars.policyDesc}"
+            }
+            }</format>
+    </payloadFactory>
+    <http.post configKey="ApiGateway">
+        <relativePath>/policies-api/1.0/policy</relativePath>
+        <headers>[{"Content-Type":"application/json"},{"accept":"*/*"}]</headers>
+        <requestBodyJson>${payload}</requestBodyJson>
+        <forceScAccepted>false</forceScAccepted>
+        <disableChunking>false</disableChunking>
+        <forceHttp10>false</forceHttp10>
+        <noKeepAlive>false</noKeepAlive>
+        <forcePostPutNobody>false</forcePostPutNobody>
+        <responseVariable>createPolicyResponse</responseVariable>
+        <overwriteBody>false</overwriteBody>
+    </http.post>
+    <!-- Extract policy_id from response -->
+    <variable name="policyId" type="STRING" expression="${vars.createPolicyResponse.payload.CreatedPolicy.Policy[0].policy_id}"/>
+    <log category="INFO">
+        <message>Policy created with ID: ${vars.policyId}</message>
+    </log>
+</sequence>

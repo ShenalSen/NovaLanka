@@ -1,0 +1,140 @@
+openapi: 3.0.1
+info:
+  title: missed-calls-api
+  description: API Definition of missed-calls-api
+  version: 1.0.0
+servers:
+  - url: http://localhost:8290/missed-calls/v1
+  - url: https://localhost:8253/missed-calls/v1
+security:
+  - default: []
+paths:
+  /notifications:
+    post:
+      summary: Process a missed call and send policy notification.
+      operationId: handleMissedCall
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mobileNo
+              properties:
+                mobileNo:
+                  type: string
+                  example: "0775678901"
+            example:
+              mobileNo: "0775678901"
+      responses:
+        "200":
+          description: Request processed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              example:
+                status: success
+                messages:
+                  - "Policy POL_001: We received your last payment of Rs.5000 on 2025-12-01. Your next due date is 2026-01-01."
+                  - "Policy POL_002: We received your last payment of Rs.3000 on 2025-11-15. Your next due date is 2026-01-10."
+        "204":
+          description: No active policies found for customer.
+        "404":
+          description: Customer not registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: user not found
+                message: Please register for this service by dialing 07******** or visit the nearest branch.
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: internal server error
+                message: An unexpected error occurred while processing the request.
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - api_key
+        optional: false
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          description: List of policy and payment detail messages.
+          items:
+            type: string
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          example: error
+        message:
+          type: string
+    NoPoliciesResponse:
+      type: object
+      properties:
+        status:
+          example: failed
+        message:
+          example: No active policies were found for your account.
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - "*"
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - http://localhost:8290/missed-calls/v1
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - http://localhost:8290/missed-calls/v1
+  type: http
+x-wso2-basePath: /missed-calls-api/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - api_key
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

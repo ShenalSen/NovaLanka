@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/sendemail" name="SendEmail" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/send">
+        <inSequence>
+            <email.send configKey="claimEmail">
+                <from>{${payload.from}}</from>
+                <personalName></personalName>
+                <to>{${payload.to}}</to>
+                <cc></cc>
+                <bcc></bcc>
+                <replyTo></replyTo>
+                <subject>${payload.subject}</subject>
+                <content>${payload.content}</content>
+                <contentType>text/html</contentType>
+                <encoding>UTF-8</encoding>
+                <attachments></attachments>
+                <inlineImages>[]</inlineImages>
+                <contentTransferEncoding>Base64</contentTransferEncoding>
+                <responseVariable>email_send_1</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </email.send>
+            <respond/>
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+</api>

@@ -1,0 +1,261 @@
+{
+	"info": {
+		"_postman_id": "9c2afe13-1129-43db-b11e-ffa1f9840a49",
+		"name": "Insurance-Claims",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-9c2afe13-1129-43db-b11e-ffa1f9840a49?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get claim by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claim/CLM_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claim",
+						"CLM_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Claim",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claim/CLM_007",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claim",
+						"CLM_007"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All claims",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claims",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claims"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Claim",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"claim\":  {\n  \"claim_id\": \"CLM_002\",\n  \"first_name\": \"gooo\",\n  \"last_name\": \"Perera\",\n  \"email\": \"nimal.perera@example.com\",\n  \"mobile_number\": \"0771234567\",\n  \"address\": \"123, Flower Road, Colombo 07\",\n  \"policy_id\": \"POL_001\",\n  \"type_of_policy\": \"Health\",\n  \"policy_value\": 500000.00,\n  \"submitted_date\": \"2025-06-10\",\n  \"incident_date\": \"2025-06-05\",\n  \"employee_name\": \"Kavindu Silva\",\n  \"current_status\": \"Submitted\",\n  \"incident_details\": \"Hospitalized due to accident\",\n  \"loss_damage_details\": \"Medical expenses for surgery\",\n  \"note\": \"Urgent processing requested\"\n}\n}\n"
+				},
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claim/CLM_002",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claim",
+						"CLM_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create claim",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"claim\":  {\n  \"first_name\": \"ioooophgj\",\n  \"last_name\": \"Perera\",\n  \"email\": \"nifghmal.perera@example.com\",\n  \"mobile_number\": \"0771234567\",\n  \"address\": \"123, Flower Road, Colombo 07\",\n  \"policy_id\": \"POL_001\",\n  \"type_of_policy\": \"Health\",\n  \"policy_value\": 500000.00,\n  \"submitted_date\": \"2025-06-10\",\n  \"incident_date\": \"2025-06-05\",\n  \"employee_name\": \"Kavindu Silva\",\n  \"current_status\": \"Submitted\",\n  \"incident_details\": \"Hospitalized due to accident\",\n  \"loss_damage_details\": \"Medical expenses for surgery\",\n  \"note\": \"Urgent processing requested\"\n}\n}\n"
+				},
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claim",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claim"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get claim by customerID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claims/customer/c_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claims",
+						"customer",
+						"c_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total claims count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claims/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claims",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get claims by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claims/employee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claims",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Total claims by Employeee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8246/claim-api/1.0/claims/count/employee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8246",
+					"path": [
+						"claim-api",
+						"1.0",
+						"claims",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "CUST123456"
+		}
+	]
+}

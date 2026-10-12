@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="QuotePersistSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Generate a unique quote ID: QT_epoch-millis -->
+    <variable name="quoteId" type="STRING" expression="${&quot;QT_&quot; + formatDateTime(now(), &quot;yyyyMMddHHmmssSSS&quot;)}"/>
+    <!-- Insert the quote into the database -->
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insurance</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql>INSERT INTO quotes (quote_id, product_id, coverage_type, age, sum_assured, term_years, frequency, base_premium, total_premium, status, created_at, valid_until) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))</sql>
+            <parameter expression="${vars.quoteId}" type="VARCHAR"/>
+            <parameter expression="${vars.productId}" type="VARCHAR"/>
+            <parameter expression="${vars.coverageType}" type="VARCHAR"/>
+            <parameter expression="${vars.age}" type="INTEGER"/>
+            <parameter expression="${vars.sumAssured}" type="DOUBLE"/>
+            <parameter expression="${vars.termYears}" type="INTEGER"/>
+            <parameter expression="${vars.frequency}" type="VARCHAR"/>
+            <parameter expression="${vars.basePremium}" type="DOUBLE"/>
+            <parameter expression="${vars.totalPremium}" type="DOUBLE"/>
+        </statement>
+    </dbreport>
+    <!-- Fetch the persisted valid_until timestamp -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insurance</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql>SELECT valid_until FROM quotes WHERE quote_id = ?</sql>
+            <parameter expression="${vars.quoteId}" type="VARCHAR"/>
+            <result name="validUntil" column="valid_until"/>
+        </statement>
+    </dblookup>
+    <!-- Build and return the quote response -->
+    <payloadFactory media-type="json">
+        <format>{
+            "quote_id": "${vars.quoteId}",
+            "product_id": "${vars.productId}",
+            "coverage_type": "${vars.coverageType}",
+            "age": ${vars.age},
+            "sum_assured": ${vars.sumAssured},
+            "term_years": ${vars.termYears},
+            "frequency": "${vars.frequency}",
+            "base_premium": ${vars.basePremium},
+            "total_premium": ${vars.totalPremium},
+            "status": "Draft",
+            "valid_until": "${properties.synapse.validUntil}"
+            }</format>
+    </payloadFactory>
+    <property name="HTTP_SC" value="201" scope="axis2"/>
+    <respond/>
+</sequence>

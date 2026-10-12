@@ -1,0 +1,215 @@
+<data name="InsuranceCustomersService" transports="http https">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+    <!-- Get All Customers -->
+    <query id="getAllCustomers" useConfig="default">
+        <sql>SELECT customer_id, first_name, last_name, DATE_FORMAT(dob, '%Y-%m-%d') as dob, gender, email, phone, address, created_at, status FROM customers</sql>
+        <result outputType="json">{
+            "Customers": {
+            "Customer": [
+            {
+            "customer_id": "$customer_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "dob": "$dob",
+            "gender": "$gender",
+            "email": "$email",
+            "phone": "$phone",
+            "address": "$address",
+            "created_at": "$created_at",
+            "status": "$status"
+            }
+            ]
+            }
+            }</result>
+    </query>
+    <resource method="GET" path="/customers">
+        <call-query href="getAllCustomers"/>
+    </resource>
+    <!-- Get Customer by ID -->
+    <query id="getCustomerById" useConfig="default">
+        <sql>SELECT customer_id, first_name, last_name, DATE_FORMAT(dob, '%Y-%m-%d') as dob, gender, email, phone, address, created_at, status FROM customers WHERE customer_id = :customer_id</sql>
+        <result outputType="json">{
+            "Customer": {
+            "customer_id": "$customer_id",
+            "first_name": "$first_name",
+            "last_name": "$last_name",
+            "dob": "$dob",
+            "gender": "$gender",
+            "email": "$email",
+            "phone": "$phone",
+            "address": "$address",
+            "created_at": "$created_at",
+            "status": "$status"
+            }
+            }</result>
+        <param name="customer_id" sqlType="STRING"/>
+    </query>
+    <resource method="GET" path="/customer/{customer_id}">
+        <call-query href="getCustomerById">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </resource>
+    <!-- Insert Customer -->
+    <query id="createCustomer" useConfig="default">
+        <sql>
+            INSERT INTO customers ( first_name, last_name, dob, gender, email, phone, address, created_at, status)
+            VALUES ( :first_name, :last_name, :dob, :gender, :email, :phone, :address, NOW(), :status)
+        </sql>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="dob" sqlType="DATE"/>
+        <param name="gender" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="phone" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+        <param name="status" sqlType="STRING"/>
+    </query>
+    <resource method="POST" path="/customer">
+        <call-query href="createCustomer">
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="dob" query-param="dob"/>
+            <with-param name="gender" query-param="gender"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="phone" query-param="phone"/>
+            <with-param name="address" query-param="address"/>
+            <with-param name="status" query-param="status"/>
+        </call-query>
+    </resource>
+    <!-- Update Customer -->
+    <query id="updateCustomer" useConfig="default">
+        <sql>
+            UPDATE customers
+            SET first_name = :first_name, last_name = :last_name, dob = :dob, gender = :gender, email = :email, phone = :phone, address = :address, status = :status
+            WHERE customer_id = :customer_id
+        </sql>
+        <param name="customer_id" sqlType="STRING"/>
+        <param name="first_name" sqlType="STRING"/>
+        <param name="last_name" sqlType="STRING"/>
+        <param name="dob" sqlType="DATE"/>
+        <param name="gender" sqlType="STRING"/>
+        <param name="email" sqlType="STRING"/>
+        <param name="phone" sqlType="STRING"/>
+        <param name="address" sqlType="STRING"/>
+        <param name="status" sqlType="STRING"/>
+    </query>
+    <resource method="PUT" path="/customer/{customer_id}">
+        <call-query href="updateCustomer">
+            <with-param name="customer_id" query-param="customer_id"/>
+            <with-param name="first_name" query-param="first_name"/>
+            <with-param name="last_name" query-param="last_name"/>
+            <with-param name="dob" query-param="dob"/>
+            <with-param name="gender" query-param="gender"/>
+            <with-param name="email" query-param="email"/>
+            <with-param name="phone" query-param="phone"/>
+            <with-param name="address" query-param="address"/>
+            <with-param name="status" query-param="status"/>
+        </call-query>
+    </resource>
+
+
+    <!-- Get total customer count -->
+<query id="countAllCustomers" useConfig="default">
+    <sql>SELECT COUNT(*) AS total_customers FROM customers</sql>
+    <result outputType="json">
+        {
+            "CustomerCount": {
+                "total_customers": "$total_customers"
+            }
+        }
+    </result>
+</query>
+
+<resource method="GET" path="/customers/count">
+    <call-query href="countAllCustomers"/>
+</resource>
+
+
+<query id="getCustomersByEmployeeId" useConfig="default">
+    <sql>
+        SELECT DISTINCT c.customer_id, c.first_name, c.last_name, DATE_FORMAT(c.dob, '%Y-%m-%d') as dob, 
+                        c.gender, c.email, c.phone, c.address, c.created_at, c.status
+        FROM customers c
+        JOIN policies p ON c.customer_id = p.customer_id
+        WHERE p.employee_id = :employee_id
+    </sql>
+    <result outputType="json">
+        {
+            "Customers": {
+                "Customer": [
+                    {
+                        "customer_id": "$customer_id",
+                        "first_name": "$first_name",
+                        "last_name": "$last_name",
+                        "dob": "$dob",
+                        "gender": "$gender",
+                        "email": "$email",
+                        "phone": "$phone",
+                        "address": "$address",
+                        "created_at": "$created_at",
+                        "status": "$status"
+                    }
+                ]
+            }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/customers/byemployee/{employee_id}">
+    <call-query href="getCustomersByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+<!-- Get Customer by Email -->
+<query id="getCustomerByEmail" useConfig="default">
+    <sql>
+        SELECT customer_id, first_name, last_name, DATE_FORMAT(dob, '%Y-%m-%d') as dob,
+               gender, email, phone, address, created_at, status
+        FROM customers
+        WHERE email = :email
+    </sql>
+    <result outputType="json">
+        {
+            "Customer": {
+                "customer_id": "$customer_id",
+                "first_name": "$first_name",
+                "last_name": "$last_name",
+                "dob": "$dob",
+                "gender": "$gender",
+                "email": "$email",
+                "phone": "$phone",
+                "address": "$address",
+                "created_at": "$created_at",
+                "status": "$status"
+            }
+        }
+    </result>
+    <param name="email" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/customerByEmail/{email}">
+    <call-query href="getCustomerByEmail">
+        <with-param name="email" query-param="email"/>
+    </call-query>
+</resource>
+
+
+    <!-- Delete Customer -->
+    <query id="deleteCustomer" useConfig="default">
+        <sql>DELETE FROM customers WHERE customer_id = :customer_id</sql>
+        <param name="customer_id" sqlType="STRING"/>
+    </query>
+    <resource method="DELETE" path="/customer/{customer_id}">
+        <call-query href="deleteCustomer">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </resource>
+</data>

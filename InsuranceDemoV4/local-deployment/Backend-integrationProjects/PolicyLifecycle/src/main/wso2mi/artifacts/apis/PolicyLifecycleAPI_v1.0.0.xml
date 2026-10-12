@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api name="PolicyLifecycleAPI" context="/policy-lifecycle/v1" version="1.0.0" version-type="context" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Policy purchase endpoint -->
+    <resource methods="POST" uri-template="/purchase">
+        <inSequence>
+            <!-- Extract client-supplied fields (quote_id + personal/payment info only) -->
+            <variable name="quoteId" type="STRING" expression="${payload.quote_id}"/>
+            <variable name="firstName" type="STRING" expression="${payload.personal_details.first_name}"/>
+            <variable name="lastName" type="STRING" expression="${payload.personal_details.last_name}"/>
+            <variable name="nicNumber" type="STRING" expression="${payload.personal_details.nic_number}"/>
+            <variable name="email" type="STRING" expression="${payload.personal_details.email}"/>
+            <variable name="mobileNumber" type="STRING" expression="${payload.personal_details.mobile_number}"/>
+            <variable name="address" type="STRING" expression="${payload.personal_details.address}"/>
+            <variable name="paymentMethod" type="STRING" expression="${payload.payment_method}"/>
+            <!-- Fetch authoritative quote data from the Quotes API -->
+            <sequence key="FetchQuoteSeq"/>
+            <!-- Compute policy dates and description -->
+            <sequence key="ComputePolicyDatesSeq"/>
+            <!-- Create the policy in Inactive state -->
+            <sequence key="CreatePolicySeq"/>
+            <!-- Record the payment -->
+            <sequence key="RecordPaymentSeq"/>
+            <!-- Activate policy if payment succeeded, otherwise return 402 -->
+            <sequence key="ActivatePolicySeq"/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>Policy lifecycle error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Policy lifecycle processing failed", "code": "${properties.synapse.ERROR_CODE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+    <!-- Policy renewal endpoint -->
+    <resource methods="POST" uri-template="/policy/{policy_id}/renew">
+        <inSequence>
+            <sequence key="RenewPolicySeq"/>
+        </inSequence>
+        <faultSequence>
+            <log category="ERROR">
+                <message>Policy renewal error: ${properties.synapse.ERROR_MESSAGE}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Policy renewal failed", "code": "${properties.synapse.ERROR_CODE}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2" type="INTEGER"/>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>
+

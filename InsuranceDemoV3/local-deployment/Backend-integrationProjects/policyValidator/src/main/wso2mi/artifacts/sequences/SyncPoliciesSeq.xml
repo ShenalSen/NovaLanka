@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="SyncPoliciesSeq" onError="SyncPoliciesFaultSeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <transaction action="new"/>
+    <!-- Set the data_ready flag to 0 to lock the gatekeeper (data_ready = 0) -->
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>SyncPoliciesSeq: Locking gatekeeper (data_ready = 0).</message>
+    </log>
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[UPDATE batch_control SET data_ready = ? WHERE job_id = ?]]></sql>
+            <parameter value="0" type="INTEGER"/>
+            <parameter expression="${configs.batch_job_id}" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+    <!-- Add missing active policies to the mirror table (valid_policies) -->
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>SyncPoliciesSeq: Inserting newly active policies into valid_policies.</message>
+    </log>
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[INSERT IGNORE INTO valid_policies (policy_id) SELECT policy_id FROM policies WHERE status = ?]]></sql>
+            <parameter value="Active" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+    <!-- Remove policies from the mirror table (valid_policies) that are no longer "Active" -->
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>SyncPoliciesSeq: Removing no longer active policies from valid_policies.</message>
+    </log>
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[DELETE vp FROM valid_policies AS vp LEFT JOIN policies AS p ON p.policy_id = vp.policy_id AND p.status = ? WHERE p.policy_id IS NULL]]></sql>
+            <parameter value="Active" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+    <!-- Set the data_ready flag to 1 to unlock the gatekeeper (data_ready = 1)-->
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>SyncPoliciesSeq: Unlocking gatekeeper (data_ready = 1).</message>
+    </log>
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[UPDATE batch_control SET data_ready = ? WHERE job_id = ?]]></sql>
+            <parameter value="1" type="INTEGER"/>
+            <parameter expression="${configs.batch_job_id}" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+
+    <transaction action="commit"/>
+
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>Policy synchronization is complete.</message>
+    </log>
+</sequence>

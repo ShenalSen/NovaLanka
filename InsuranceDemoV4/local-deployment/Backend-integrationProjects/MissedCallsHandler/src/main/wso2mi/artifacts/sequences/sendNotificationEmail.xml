@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="sendNotificationEmail" xmlns="http://ws.apache.org/ns/synapse">
+    <email.send configKey="gmailConnection">
+        <from>{${configs.email_from}}</from>
+        <personalName></personalName>
+        <to>{${vars.emailTo}}</to>
+        <cc></cc>
+        <bcc></bcc>
+        <replyTo></replyTo>
+        <subject>Insurance Service Notification</subject>
+        <content>${exists(payload.htmlBody) ? payload.htmlBody : payload}</content>
+        <contentType>text/html</contentType>
+        <encoding>UTF-8</encoding>
+        <attachments></attachments>
+        <inlineImages>[]</inlineImages>
+        <contentTransferEncoding>Base64</contentTransferEncoding>
+        <responseVariable>email_send_1</responseVariable>
+        <overwriteBody>true</overwriteBody>
+    </email.send>
+</sequence>

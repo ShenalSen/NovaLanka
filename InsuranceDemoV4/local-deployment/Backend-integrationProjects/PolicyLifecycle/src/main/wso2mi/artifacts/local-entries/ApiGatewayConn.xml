@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="ApiGateway" xmlns="http://ws.apache.org/ns/synapse">
+    <http.init>
+        <connectionType>HTTPS</connectionType>
+        <name>ApiGateway</name>
+        <baseUrl>{${configs.api_gateway_url}}</baseUrl>
+        <authType>None</authType>
+    </http.init>
+</localEntry>

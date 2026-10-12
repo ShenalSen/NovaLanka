@@ -1,0 +1,337 @@
+openapi: 3.0.1
+info:
+  title: policies-api
+  version: "1.0"
+servers:
+ -
+  url: http://localhost:8290/services/InsurancePoliciesService
+security:
+ -
+  default: []
+paths:
+  /policies:
+    get:
+      parameters: []
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policy:
+    post:
+      parameters: []
+      requestBody:
+        description: Create a new policy
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyCreateWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policy/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    put:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      requestBody:
+        description: Update an existing policy
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyUpdateWrapper"
+        required: true
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+    delete:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policies/customer/{customer_id}:
+    get:
+      parameters:
+       -
+        name: customer_id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policies/count:
+    get:
+      parameters: []
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policies/count/employee/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /policies/employee/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+  /customers/count/employee/{id}:
+    get:
+      parameters:
+       -
+        name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: string
+      responses:
+        "200":
+          description: ok
+      security:
+       -
+        default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+         - oauth2
+        optional: false
+components:
+  schemas:
+    PolicyCreateWrapper:
+      required:
+       - Create a policy
+      type: object
+      properties:
+        Create a policy:
+          $ref: "#/components/schemas/PolicyBase"
+    PolicyUpdateWrapper:
+      required:
+       - Update a policy
+      type: object
+      properties:
+        Update a policy:
+          $ref: "#/components/schemas/PolicyFull"
+    PolicyBase:
+      required:
+       - customer_id
+       - employee_id
+       - end_date
+       - policy_details
+       - product_id
+       - start_date
+       - status
+      type: object
+      properties:
+        customer_id:
+          type: string
+        product_id:
+          type: string
+        employee_id:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        status:
+          type: string
+        policy_details:
+          type: string
+    PolicyFull:
+      allOf:
+       -
+        $ref: "#/components/schemas/PolicyBase"
+       -
+        required:
+         - policy_id
+        type: object
+        properties:
+          policy_id:
+            type: string
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://test.com
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+   - '*'
+  accessControlAllowCredentials: true
+  accessControlAllowHeaders:
+   - authorization
+   - Access-Control-Allow-Origin
+   - Content-Type
+   - SOAPAction
+   - apikey
+   - Internal-Key
+  accessControlAllowMethods:
+   - GET
+   - PUT
+   - POST
+   - DELETE
+   - PATCH
+   - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+   - http://localhost:8290/services/InsurancePoliciesService
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+   - http://localhost:8290/services/InsurancePoliciesService
+  type: http
+x-wso2-basePath: /policies-api/1.0
+x-wso2-transports:
+ - http
+ - https
+x-wso2-application-security:
+  security-types:
+   - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

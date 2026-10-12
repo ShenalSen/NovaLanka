@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="PaymentValidationSeq">
+
+    <!-- Validate required fields -->
+    <filter xpath="${not(exists(payload.policy_id)) or not(exists(payload.amount)) or not(exists(payload.tran_date)) or not(exists(payload.first_name)) or not(exists(payload.last_name)) or not(exists(payload.nic_number)) or not(exists(payload.email)) or not(exists(payload.mobile_number)) or not(exists(payload.address))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Validation failed.", "message": "Missing required fields."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Validation passed for new payment request.</message>
+            </log>
+        </else>
+    </filter>
+
+    <!-- Validate amount is a positive number -->
+    <filter xpath="${float(payload.amount) &lt;= 0}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Validation failed.", "message": "Amount must be a positive number."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Amount validation passed.</message>
+            </log>
+        </else>
+    </filter>
+
+    <!-- Validate payment_method enum -->
+    <filter xpath="${exists(payload.payment_method) and not((payload.payment_method == &quot;Cash&quot;) or (payload.payment_method == &quot;Card&quot;) or (payload.payment_method == &quot;Bank Transfer&quot;) or (payload.payment_method == &quot;Online&quot;))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Validation failed.", "message": "Payment_method must be one of: Cash, Card, Bank Transfer, Online."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Payment method validation passed.</message>
+            </log>
+        </else>
+    </filter>
+
+    <!-- Validate status enum -->
+    <filter xpath="${exists(payload.status) and not((payload.status == &quot;Success&quot;) or (payload.status == &quot;Failed&quot;) or (payload.status == &quot;Pending&quot;))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"error": "Validation failed.", "message": "Status must be one of: Success, Failed, Pending."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="400" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Status validation passed.</message>
+            </log>
+        </else>
+    </filter>
+
+</sequence>

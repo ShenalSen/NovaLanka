@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="PaymentPropertyBridgeSeq">
+
+    <!-- Bridge payload fields to properties for dataServiceCall param compatibility -->
+    <property name="p_policy_id" expression="${payload.policy_id}" scope="default"/>
+    <property name="p_customer_id" expression="${exists(payload.customer_id) ? payload.customer_id : &quot;&quot;}" scope="default"/>
+    <property name="p_first_name" expression="${payload.first_name}" scope="default"/>
+    <property name="p_last_name" expression="${payload.last_name}" scope="default"/>
+    <property name="p_nic_number" expression="${payload.nic_number}" scope="default"/>
+    <property name="p_email" expression="${payload.email}" scope="default"/>
+    <property name="p_mobile_number" expression="${payload.mobile_number}" scope="default"/>
+    <property name="p_address" expression="${payload.address}" scope="default"/>
+    <property name="p_amount" expression="${payload.amount}" scope="default"/>
+    <property name="p_tran_date" expression="${payload.tran_date}" scope="default"/>
+    <property name="p_payment_method" expression="${exists(payload.payment_method) ? payload.payment_method : &quot;Online&quot;}" scope="default"/>
+    <property name="p_reference_no" expression="${exists(payload.reference_no) ? payload.reference_no : &quot;REF&quot; + formatDateTime(now(), &quot;yyyyMMddHHmmssSSS&quot;)}" scope="default"/>
+    <property name="p_status" expression="${exists(payload.status) ? payload.status : &quot;Success&quot;}" scope="default"/>
+
+</sequence>

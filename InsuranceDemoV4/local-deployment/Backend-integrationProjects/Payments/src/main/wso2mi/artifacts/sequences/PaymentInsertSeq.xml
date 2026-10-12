@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="PaymentInsertSeq">
+
+    <!-- Call data service to insert payment -->
+    <dataServiceCall serviceName="InsurancePaymentsService">
+        <source type="inline"/>
+        <operations type="single">
+            <operation name="insertPaymentOp">
+                <param name="policy_id" expression="get-property('p_policy_id')"/>
+                <param name="customer_id" expression="get-property('p_customer_id')"/>
+                <param name="first_name" expression="get-property('p_first_name')"/>
+                <param name="last_name" expression="get-property('p_last_name')"/>
+                <param name="nic_number" expression="get-property('p_nic_number')"/>
+                <param name="email" expression="get-property('p_email')"/>
+                <param name="mobile_number" expression="get-property('p_mobile_number')"/>
+                <param name="address" expression="get-property('p_address')"/>
+                <param name="amount" expression="get-property('p_amount')"/>
+                <param name="tran_date" expression="get-property('p_tran_date')"/>
+                <param name="payment_method" expression="get-property('p_payment_method')"/>
+                <param name="reference_no" expression="get-property('p_reference_no')"/>
+                <param name="status" expression="get-property('p_status')"/>
+            </operation>
+        </operations>
+        <target type="body"/>
+    </dataServiceCall>
+
+    <!-- Fetch the generated payment_id using reference_no -->
+    <dataServiceCall serviceName="InsurancePaymentsService">
+        <source type="inline"/>
+        <operations type="single">
+            <operation name="getPaymentIdByRefNoOp">
+                <param name="reference_no" expression="get-property('p_reference_no')"/>
+            </operation>
+        </operations>
+        <target type="body"/>
+    </dataServiceCall>
+    <property name="messageType" value="application/json" scope="axis2"/>
+
+    <!-- Null-check: verify payment_id was returned -->
+    <filter xpath="${not(exists(payload.payments.payment.payment_id))}">
+        <then>
+            <log category="ERROR">
+                <message>Payment inserted, but could not retrieve payment_id for reference_no: ${properties.synapse.p_reference_no}</message>
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"error": "Internal server error.", "message": "Payment was recorded but payment_id could not be retrieved."}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <respond/>
+        </then>
+        <else>
+            <variable name="newPaymentId" expression="${payload.payments.payment.payment_id}" type="STRING"/>
+            <!-- Create the response payload -->
+            <payloadFactory media-type="json">
+                <format>{"status": "success", "message": "Payment recorded successfully.", "payment_id": "${vars.newPaymentId}"}</format>
+            </payloadFactory>
+            <property name="HTTP_SC" value="201" scope="axis2"/>
+            <respond/>
+        </else>
+    </filter>
+
+</sequence>

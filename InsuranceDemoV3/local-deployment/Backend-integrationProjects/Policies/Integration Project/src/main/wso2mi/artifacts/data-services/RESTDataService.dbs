@@ -1,0 +1,260 @@
+<data name="InsurancePoliciesService" transports="http https" serviceType="data" media-type="json">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+
+    <!-- Get All Policies -->
+    <query id="getAllPolicies" useConfig="default">
+        <sql>SELECT * FROM policies</sql>
+        <result outputType="json">
+            {
+                "Policies": {
+                    "Policy": [
+                        {
+                            "policy_id": "$policy_id",
+                            "customer_id": "$customer_id",
+                            "product_id": "$product_id",
+                            "employee_id": "$employee_id",
+                            "start_date": "$start_date",
+                            "end_date": "$end_date",
+                            "status": "$status",
+                            "policy_details": "$policy_details"
+                        }
+                    ]
+                }
+            }
+        </result>
+    </query>
+
+    <resource method="GET" path="/policies">
+        <call-query href="getAllPolicies"/>
+    </resource>
+
+    <!-- Get Policy by ID -->
+    <query id="getPolicyById" useConfig="default">
+        <sql>SELECT * FROM policies WHERE policy_id = :policy_id</sql>
+        <result outputType="json">
+            {
+                "Policy": {
+                    "policy_id": "$policy_id",
+                    "customer_id": "$customer_id",
+                    "product_id": "$product_id",
+                    "employee_id": "$employee_id",
+                    "start_date": "$start_date",
+                    "end_date": "$end_date",
+                    "status": "$status",
+                    "policy_details": "$policy_details"
+                }
+            }
+        </result>
+        <param name="policy_id" sqlType="STRING"/>
+    </query>
+
+    <resource method="GET" path="/policy/{policy_id}">
+        <call-query href="getPolicyById">
+            <with-param name="policy_id" query-param="policy_id"/>
+        </call-query>
+    </resource>
+
+    <!-- ✅ Get Policies by Customer ID -->
+    <query id="getPoliciesByCustomerId" useConfig="default">
+        <sql>SELECT * FROM policies WHERE customer_id = :customer_id</sql>
+        <result outputType="json">
+            {
+                "Policies": {
+                    "Policy": [
+                        {
+                            "policy_id": "$policy_id",
+                            "customer_id": "$customer_id",
+                            "product_id": "$product_id",
+                            "employee_id": "$employee_id",
+                            "start_date": "$start_date",
+                            "end_date": "$end_date",
+                            "status": "$status",
+                            "policy_details": "$policy_details"
+                        }
+                    ]
+                }
+            }
+        </result>
+        <param name="customer_id" sqlType="STRING"/>
+    </query>
+
+    <resource method="GET" path="/policies/customer/{customer_id}">
+        <call-query href="getPoliciesByCustomerId">
+            <with-param name="customer_id" query-param="customer_id"/>
+        </call-query>
+    </resource>
+
+    <!-- Insert New Policy -->
+    <query id="createPolicy" useConfig="default">
+        <sql>
+            INSERT INTO policies ( customer_id, product_id, employee_id, start_date, end_date, status, policy_details)
+            VALUES ( :customer_id, :product_id, :employee_id, :start_date, :end_date, :status, :policy_details)
+        </sql>
+        <param name="customer_id" sqlType="STRING"/>
+        <param name="product_id" sqlType="STRING"/>
+        <param name="employee_id" sqlType="STRING"/>
+        <param name="start_date" sqlType="DATE"/>
+        <param name="end_date" sqlType="DATE"/>
+        <param name="status" sqlType="STRING"/>
+        <param name="policy_details" sqlType="STRING"/>
+    </query>
+
+    <resource method="POST" path="/policy">
+        <call-query href="createPolicy">
+            <with-param name="customer_id" query-param="customer_id"/>
+            <with-param name="product_id" query-param="product_id"/>
+            <with-param name="employee_id" query-param="employee_id"/>
+            <with-param name="start_date" query-param="start_date"/>
+            <with-param name="end_date" query-param="end_date"/>
+            <with-param name="status" query-param="status"/>
+            <with-param name="policy_details" query-param="policy_details"/>
+        </call-query>
+    </resource>
+
+    <!-- Update Existing Policy -->
+    <query id="updatePolicy" useConfig="default">
+        <sql>
+            UPDATE policies SET
+                customer_id = :customer_id,
+                product_id = :product_id,
+                employee_id = :employee_id,
+                start_date = :start_date,
+                end_date = :end_date,
+                status = :status,
+                policy_details = :policy_details
+            WHERE policy_id = :policy_id
+        </sql>
+        <param name="policy_id" sqlType="STRING"/>
+        <param name="customer_id" sqlType="STRING"/>
+        <param name="product_id" sqlType="STRING"/>
+        <param name="employee_id" sqlType="STRING"/>
+        <param name="start_date" sqlType="DATE"/>
+        <param name="end_date" sqlType="DATE"/>
+        <param name="status" sqlType="STRING"/>
+        <param name="policy_details" sqlType="STRING"/>
+    </query>
+
+    <resource method="PUT" path="/policy/{policy_id}">
+        <call-query href="updatePolicy">
+            <with-param name="policy_id" query-param="policy_id"/>
+            <with-param name="customer_id" query-param="customer_id"/>
+            <with-param name="product_id" query-param="product_id"/>
+            <with-param name="employee_id" query-param="employee_id"/>
+            <with-param name="start_date" query-param="start_date"/>
+            <with-param name="end_date" query-param="end_date"/>
+            <with-param name="status" query-param="status"/>
+            <with-param name="policy_details" query-param="policy_details"/>
+        </call-query>
+    </resource>
+
+    <!-- Count All Policies -->
+<query id="countPolicies" useConfig="default">
+    <sql>SELECT COUNT(*) AS total_policies FROM policies</sql>
+    <result outputType="json">
+        {
+            "PolicyCount": {
+                "total_policies": "$total_policies"
+            }
+        }
+        </result>
+</query>
+
+<resource method="GET" path="/policies/count">
+    <call-query href="countPolicies"/>
+</resource>
+
+<!-- Count Policies by Employee ID -->
+<query id="countPoliciesByEmployeeId" useConfig="default">
+    <sql>SELECT COUNT(*) AS total_policies FROM policies WHERE employee_id = :employee_id</sql>
+    <result outputType="json">
+        {
+            "PolicyCountByEmployee": {
+                "employee_id": "$employee_id",
+                "total_policies": "$total_policies"
+            }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/policies/count/employee/{employee_id}">
+    <call-query href="countPoliciesByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+<!-- Get Policies by Employee ID -->
+<query id="getPoliciesByEmployeeId" useConfig="default">
+    <sql>SELECT * FROM policies WHERE employee_id = :employee_id</sql>
+    <result outputType="json">
+        {
+            "Policies": {
+                "Policy": [
+                    {
+                        "policy_id": "$policy_id",
+                        "customer_id": "$customer_id",
+                        "product_id": "$product_id",
+                        "employee_id": "$employee_id",
+                        "start_date": "$start_date",
+                        "end_date": "$end_date",
+                        "status": "$status",
+                        "policy_details": "$policy_details"
+                    }
+                ]
+            }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/policies/employee/{employee_id}">
+    <call-query href="getPoliciesByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+
+<!-- Count distinct customers by employee ID -->
+<query id="countCustomersByEmployeeId" useConfig="default">
+    <sql>SELECT COUNT(DISTINCT customer_id) AS total_customers FROM policies WHERE employee_id = :employee_id</sql>
+    <result outputType="json">
+        {
+            "CustomerCountByEmployee": {
+                "employee_id": "$employee_id",
+                "total_customers": "$total_customers"
+            }
+        }
+    </result>
+    <param name="employee_id" sqlType="STRING"/>
+</query>
+
+<resource method="GET" path="/customers/count/employee/{employee_id}">
+    <call-query href="countCustomersByEmployeeId">
+        <with-param name="employee_id" query-param="employee_id"/>
+    </call-query>
+</resource>
+
+
+
+
+    <!-- Delete Policy -->
+    <query id="deletePolicy" useConfig="default">
+        <sql>DELETE FROM policies WHERE policy_id = :policy_id</sql>
+        <param name="policy_id" sqlType="STRING"/>
+    </query>
+
+    <resource method="DELETE" path="/policy/{policy_id}">
+        <call-query href="deletePolicy">
+            <with-param name="policy_id" query-param="policy_id"/>
+        </call-query>
+    </resource>
+
+
+</data>

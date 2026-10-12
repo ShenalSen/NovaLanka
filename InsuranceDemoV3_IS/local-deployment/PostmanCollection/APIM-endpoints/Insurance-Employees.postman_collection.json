@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "ba66793f-8bff-4074-a781-06d98227b03f",
+		"name": "Insurance-Employees",
+		"description": "Postman collection for WSO2 Data Service - InsuranceEmployeesService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-ba66793f-8bff-4074-a781-06d98227b03f?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get All Employees",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/employee-api/1.0/employees",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"employee-api",
+						"1.0",
+						"employees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Employee By ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8243/employee-api/1.0/employee/E_001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"employee-api",
+						"1.0",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Employee",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"employee\": {\r\n        \"first_name\": \"John\",\r\n        \"last_name\": \"Doe\",\r\n        \"role\": \"Manager\",\r\n        \"email\": \"nbjhbjh@example.com\",\r\n        \"phone\": \"1234567890\",\r\n        \"address\": \"Galle\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/employee-api/1.0/employee",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"employee-api",
+						"1.0",
+						"employee"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Employee",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"employee\": {\r\n        \"employee_id\": \"E_004\",\r\n        \"first_name\": \"Divya\",\r\n        \"last_name\": \"Doe\",\r\n        \"role\": \"Manager\",\r\n        \"email\": \"ko@example.com\",\r\n        \"phone\": \"1234567890\",\r\n        \"address\": \"Galle\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://localhost:8243/employee-api/1.0/employee/E_004",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"employee-api",
+						"1.0",
+						"employee",
+						"E_004"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Employee",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8243/employee-api/1.0/employee/E_006",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"employee-api",
+						"1.0",
+						"employee",
+						"E_006"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

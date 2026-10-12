@@ -1,0 +1,60 @@
+<api xmlns="http://ws.apache.org/ns/synapse" name="AddressVerificationAPI" context="/addressverification">
+    <resource methods="POST" uri-template="/address">
+        <inSequence>
+            <log level="custom">
+                <property name="message" value="Address verification request received"/>
+            </log>
+            <property name="address" expression="json-eval($.address)" scope="default" type="STRING"/>
+            <property name="User-Agent" value="WSO2-AddressVerification-API/1.0.0" scope="transport"/>
+            <property name="Accept-Encoding" value="identity" scope="transport"/>
+            <property name="openstreetmap.endpoint" expression="get-property('synapse', 'openstreetmap.endpoint')" scope="default" type="STRING"/>
+            <property name="uri.var.apiUrl" expression="fn:concat(get-property('openstreetmap.endpoint'), '?q=', get-property('address'), '&amp;format=json&amp;limit=1')" scope="default" type="STRING"/>
+            <call>
+                <endpoint>
+                    <http method="GET" uri-template="{uri.var.apiUrl}"/>
+                </endpoint>
+            </call>
+            <property name="hasResult" expression="json-eval($.length())" scope="default" type="INTEGER"/>
+            <filter source="get-property('hasResult')" regex="[1-9].*">
+                <then>
+                    <property name="messageType" value="application/json" scope="axis2"/>
+                    <property name="ContentType" value="application/json" scope="transport"/>
+                    <property name="displayName" expression="json-eval($.[0].display_name)" scope="default" type="STRING"/>
+                    <payloadFactory media-type="json">
+                        <format>{"valid": true, "display_name": "$1"}</format>
+                        <args>
+                            <arg value="{get-property('displayName')}"/>
+                        </args>
+                    </payloadFactory>
+                    <respond/>
+                </then>
+                <else>
+                    <property name="messageType" value="application/json" scope="axis2"/>
+                    <property name="ContentType" value="application/json" scope="transport"/>
+                    <payloadFactory media-type="json">
+                        <format>{"valid": false, "message": "Address not found"}</format>
+                        <args/>
+                    </payloadFactory>
+                    <respond/>
+                </else>
+            </filter>
+        </inSequence>
+        <outSequence/>
+        <faultSequence>
+            <log level="custom" category="ERROR">
+                <property name="message" value="Error occurred in Address Verification API"/>
+                <property name="errorMessage" expression="get-property('ERROR_MESSAGE')"/>
+                <property name="errorCode" expression="get-property('ERROR_CODE')"/>
+            </log>
+            <property name="messageType" value="application/json" scope="axis2"/>
+            <property name="ContentType" value="application/json" scope="transport"/>
+            <payloadFactory media-type="json">
+                <format>{"error": true, "message": "An internal error occurred", "details": "$1"}</format>
+                <args>
+                    <arg expression="get-property('ERROR_MESSAGE')"/>
+                </args>
+            </payloadFactory>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>

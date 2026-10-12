@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Fault sequence for SyncPoliciesSeq-->
+<sequence name="SyncPoliciesFaultSeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+
+    <!-- Log failure details for operators -->
+    <log category="ERROR" logMessageID="false" logFullPayload="false">
+        <message>SyncPoliciesSeq: Failed to complete synchronization.</message>
+    </log>
+
+    <!-- Roll back the inflight transaction started by SyncPoliciesSeq -->
+    <transaction action="rollback"/>
+
+    <!-- Reopen the gatekeeper so consumers don't stay blocked -->
+    <dbreport>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[UPDATE batch_control SET data_ready = ? WHERE job_id = ?]]></sql>
+            <parameter value="1" type="INTEGER"/>
+            <parameter expression="${configs.batch_job_id}" type="VARCHAR"/>
+        </statement>
+    </dbreport>
+
+</sequence>

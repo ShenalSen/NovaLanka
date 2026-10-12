@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="ValidatePolicySeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Extract policy_id from the request payload -->
+    <variable name="policyId" expression="${params.pathParams.policy_id}" type="STRING"/>
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>ValidatePolicySeq: Validating policy_id=${vars.policyId}</message>
+    </log>
+    <!-- Look up valid_policies mirror table -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[SELECT COUNT(*) AS policy_count FROM valid_policies WHERE policy_id = ?]]></sql>
+            <parameter expression="${vars.policyId}" type="VARCHAR"/>
+            <result column="policy_count" name="policy_count"/>
+        </statement>
+    </dblookup>
+    <variable name="policyCount" expression="${properties.synapse.policy_count}" type="STRING"/>
+    <!-- If policy_id is found in valid_policies table, return valid: 1, otherwise return valid: 0 -->
+    <filter xpath="${integer(vars.policyCount) > 0}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>{"valid": 1, "policy_id": "${vars.policyId}", "message": "Policy is active and valid."}</format>
+            </payloadFactory>
+        </then>
+        <else>
+            <payloadFactory media-type="json">
+                <format>{"valid": 0, "policy_id": "${vars.policyId}", "message": "Policy is not valid."}</format>
+            </payloadFactory>
+        </else>
+    </filter>
+    <respond/>
+</sequence>

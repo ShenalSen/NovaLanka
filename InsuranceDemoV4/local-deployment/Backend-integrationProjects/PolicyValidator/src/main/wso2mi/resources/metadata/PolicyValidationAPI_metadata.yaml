@@ -1,0 +1,10 @@
+---
+key: "PolicyValidationAPI-1.0.0"
+name : "PolicyValidationAPI"
+displayName : "PolicyValidationAPI"
+description: "PolicyValidationAPI"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/policy/v1"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

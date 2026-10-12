@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="AutomatedCheckPolicyEndDateTaskSeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log category="INFO">
+        <message>AutomatedCheckPolicyEndDateTask: Checking policies expiring in 30, 15, or 7 days</message>
+    </log>
+    <!-- Fetch all Active policies expiring in exactly 30, 15, or 7 days that have a registered customer.
+         JSON_ARRAYAGG aggregates multiple rows into a single JSON array string in one dblookup call. -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insuranceDS</dsName>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[
+                SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                    'policy_id',  p.policy_id,
+                    'end_date',   DATE_FORMAT(p.end_date, '%Y-%m-%d'),
+                    'days_left',  DATEDIFF(p.end_date, CURDATE()),
+                    'email',      c.email,
+                    'first_name', c.first_name,
+                    'last_name',  c.last_name,
+                    'premium',    p.premium_amount
+                )) AS reminder_list
+                FROM policies p
+                JOIN customers c ON p.customer_id = c.customer_id
+                WHERE p.status = 'Active'
+                  AND p.customer_id IS NOT NULL
+                  AND p.end_date IN (
+                      DATE_ADD(CURDATE(), INTERVAL 30 DAY),
+                      DATE_ADD(CURDATE(), INTERVAL 15 DAY),
+                      DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                  )
+            ]]></sql>
+            <result column="reminder_list" name="reminder_list"/>
+        </statement>
+    </dblookup>
+    <!-- If no policies match, dblookup key is absent — exists() is the safe null guard in Synapse. -->
+    <filter xpath="${not(exists(properties.synapse.reminder_list))}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>[]</format>
+            </payloadFactory>
+        </then>
+        <else>
+            <payloadFactory media-type="json">
+                <format>${properties.synapse.reminder_list}</format>
+            </payloadFactory>
+        </else>
+    </filter>
+    <log category="INFO">
+        <message>AutomatedCheckPolicyEndDateTask: Policies to remind = ${length(payload)}</message>
+    </log>
+    <!-- Capture frontend_url into a variable for use inside forEach -->
+    <variable name="frontendUrl" type="STRING" expression="${configs.frontend_url}"/>
+    <!-- Iterate over each policy and send a reminder email -->
+    <foreach collection="${payload}" parallel-execution="false" counter-variable="idx">
+        <sequence>
+            <sequence key="SendRenewalReminderSeq"/>
+        </sequence>
+    </foreach>
+    <log category="INFO">
+        <message>AutomatedCheckPolicyEndDateTask: Reminder processing complete</message>
+    </log>
+</sequence>

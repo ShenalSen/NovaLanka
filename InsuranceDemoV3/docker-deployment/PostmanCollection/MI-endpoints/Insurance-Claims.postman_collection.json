@@ -1,0 +1,261 @@
+{
+	"info": {
+		"_postman_id": "6b78eafb-ed18-4c40-8ea7-270dbd05a07c",
+		"name": "Insurance-Claims",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/DataService-MI~76a70266-115f-4bf4-9b6d-4bf9cb266488/collection/42569940-6b78eafb-ed18-4c40-8ea7-270dbd05a07c?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Get claim by ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claim/CLM_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claim",
+						"CLM_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Claim",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claim/CLM_007",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claim",
+						"CLM_007"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All claims",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claims",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claims"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Claim",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"claim\":  {\n  \"claim_id\": \"CLM_002\",\n  \"first_name\": \"kiya\",\n  \"last_name\": \"Perera\",\n  \"email\": \"nimal.perera@example.com\",\n  \"mobile_number\": \"0771234567\",\n  \"address\": \"123, Flower Road, Colombo 07\",\n  \"policy_id\": \"POL_001\",\n  \"type_of_policy\": \"Health\",\n  \"policy_value\": 500000.00,\n  \"submitted_date\": \"2025-06-10\",\n  \"incident_date\": \"2025-06-05\",\n  \"employee_name\": \"Kavindu Silva\",\n  \"current_status\": \"Submitted\",\n  \"incident_details\": \"Hospitalized due to accident\",\n  \"loss_damage_details\": \"Medical expenses for surgery\",\n  \"note\": \"Urgent processing requested\"\n}\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claim/CLM_002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claim",
+						"CLM_002"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create claim",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"claim\":  {\n  \"first_name\": \"ed\",\n  \"last_name\": \"Perera\",\n  \"email\": \"nifghmal.perera@example.com\",\n  \"mobile_number\": \"0771234567\",\n  \"address\": \"123, Flower Road, Colombo 07\",\n  \"policy_id\": \"POL_001\",\n  \"type_of_policy\": \"Health\",\n  \"policy_value\": 500000.00,\n  \"submitted_date\": \"2025-06-10\",\n  \"incident_date\": \"2025-06-05\",\n  \"employee_name\": \"Kavindu Silva\",\n  \"current_status\": \"Submitted\",\n  \"incident_details\": \"Hospitalized due to accident\",\n  \"loss_damage_details\": \"Medical expenses for surgery\",\n  \"note\": \"Urgent processing requested\"\n}\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claim",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claim"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get claim by customerID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claims/customer/c_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claims",
+						"customer",
+						"c_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total claims count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claims/count",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claims",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get claims by employee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claims/employee/E_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claims",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Total claims by Employeee ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8290/services/InsuranceClaimsService/claims/count/employee/E_001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8290",
+					"path": [
+						"services",
+						"InsuranceClaimsService",
+						"claims",
+						"count",
+						"employee",
+						"E_001"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "CUST123456"
+		}
+	]
+}

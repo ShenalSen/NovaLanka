@@ -1,0 +1,206 @@
+<data name="InsurancePaymentsService" transports="http https">
+    <config id="default">
+        <property name="driverClassName">${configs.driver_className}</property>
+        <property name="url">${configs.url}</property>
+        <property name="username">${configs.username}</property>
+        <property name="password">${configs.password}</property>
+    </config>
+
+    <!-- POST Payment — insert a new payment record -->
+    <query id="insertPayment" useConfig="default" returnGeneratedKeys="true">
+        <sql>
+            INSERT INTO policy_payments
+                (policy_id, customer_id, first_name, last_name, nic_number, email, mobile_number, address,
+                 amount, tran_date, payment_method, reference_no, status)
+            VALUES
+                (:policy_id, NULLIF(:customer_id, ''), :first_name, :last_name,
+                 :nic_number, :email, :mobile_number, :address,
+                 :amount, :tran_date, :payment_method, :reference_no, :status)
+        </sql>
+        <param name="policy_id"      sqlType="STRING"  optional="false"/>
+        <param name="customer_id"    sqlType="STRING"  optional="true"  defaultValue=""/>
+        <param name="first_name"     sqlType="STRING"  optional="false"/>
+        <param name="last_name"      sqlType="STRING"  optional="false"/>
+        <param name="nic_number"     sqlType="STRING"  optional="false"/>
+        <param name="email"          sqlType="STRING"  optional="false"/>
+        <param name="mobile_number"  sqlType="STRING"  optional="false"/>
+        <param name="address"        sqlType="STRING"  optional="false"/>
+        <param name="amount"         sqlType="DOUBLE"  optional="false"/>
+        <param name="tran_date"      sqlType="DATE"    optional="false"/>
+        <param name="payment_method" sqlType="STRING"  optional="true"  defaultValue="Online"/>
+        <param name="reference_no"   sqlType="STRING"  optional="false"/>
+        <param name="status"         sqlType="STRING"  optional="true"  defaultValue="Success"/>
+    </query>
+
+    <!-- GET All Payments -->
+    <query id="getAllPayments" useConfig="default">
+        <sql>
+            SELECT payment_id, policy_id, customer_id, first_name, last_name,
+                   email, mobile_number, address, amount, tran_date,
+                   payment_method, reference_no, status, created_at
+            FROM policy_payments
+            ORDER BY created_at DESC
+        </sql>
+        <result element="payments" rowName="payment">
+            <element column="payment_id"     name="payment_id"     xsdType="string"/>
+            <element column="policy_id"      name="policy_id"      xsdType="string"/>
+            <element column="customer_id"    name="customer_id"    xsdType="string"/>
+            <element column="first_name"     name="first_name"     xsdType="string"/>
+            <element column="last_name"      name="last_name"      xsdType="string"/>
+            <element column="email"          name="email"          xsdType="string"/>
+            <element column="mobile_number"  name="mobile_number"  xsdType="string"/>
+            <element column="address"        name="address"        xsdType="string"/>
+            <element column="amount"         name="amount"         xsdType="decimal"/>
+            <element column="tran_date"      name="tran_date"      xsdType="date"/>
+            <element column="payment_method" name="payment_method" xsdType="string"/>
+            <element column="reference_no"   name="reference_no"   xsdType="string"/>
+            <element column="status"         name="status"         xsdType="string"/>
+            <element column="created_at"     name="created_at"     xsdType="string"/>
+        </result>
+    </query>
+
+    <!-- GET Payments by Policy ID -->
+    <query id="getPaymentsByPolicyId" useConfig="default">
+        <sql>
+            SELECT payment_id, policy_id, customer_id, first_name, last_name,
+                   email, mobile_number, address, amount, tran_date,
+                   payment_method, reference_no, status, created_at
+            FROM policy_payments
+            WHERE policy_id = :policy_id
+            ORDER BY tran_date DESC
+        </sql>
+        <param name="policy_id" sqlType="STRING" optional="false"/>
+        <result element="payments" rowName="payment">
+            <element column="payment_id"     name="payment_id"     xsdType="string"/>
+            <element column="policy_id"      name="policy_id"      xsdType="string"/>
+            <element column="customer_id"    name="customer_id"    xsdType="string"/>
+            <element column="first_name"     name="first_name"     xsdType="string"/>
+            <element column="last_name"      name="last_name"      xsdType="string"/>
+            <element column="email"          name="email"          xsdType="string"/>
+            <element column="mobile_number"  name="mobile_number"  xsdType="string"/>
+            <element column="address"        name="address"        xsdType="string"/>
+            <element column="amount"         name="amount"         xsdType="decimal"/>
+            <element column="tran_date"      name="tran_date"      xsdType="date"/>
+            <element column="payment_method" name="payment_method" xsdType="string"/>
+            <element column="reference_no"   name="reference_no"   xsdType="string"/>
+            <element column="status"         name="status"         xsdType="string"/>
+            <element column="created_at"     name="created_at"     xsdType="string"/>
+        </result>
+    </query>
+
+    <!-- GET Payment by Payment ID -->
+    <query id="getPaymentById" useConfig="default">
+        <sql>
+            SELECT payment_id, policy_id, customer_id, first_name, last_name,
+                   email, mobile_number, address, amount, tran_date,
+                   payment_method, reference_no, status, created_at
+            FROM policy_payments
+            WHERE payment_id = :payment_id
+        </sql>
+        <param name="payment_id" sqlType="STRING" optional="false"/>
+        <result element="payments" rowName="payment">
+            <element column="payment_id"     name="payment_id"     xsdType="string"/>
+            <element column="policy_id"      name="policy_id"      xsdType="string"/>
+            <element column="customer_id"    name="customer_id"    xsdType="string"/>
+            <element column="first_name"     name="first_name"     xsdType="string"/>
+            <element column="last_name"      name="last_name"      xsdType="string"/>
+            <element column="email"          name="email"          xsdType="string"/>
+            <element column="mobile_number"  name="mobile_number"  xsdType="string"/>
+            <element column="address"        name="address"        xsdType="string"/>
+            <element column="amount"         name="amount"         xsdType="decimal"/>
+            <element column="tran_date"      name="tran_date"      xsdType="date"/>
+            <element column="payment_method" name="payment_method" xsdType="string"/>
+            <element column="reference_no"   name="reference_no"   xsdType="string"/>
+            <element column="status"         name="status"         xsdType="string"/>
+            <element column="created_at"     name="created_at"     xsdType="string"/>
+        </result>
+    </query>
+
+    <!-- GET Payment ID by Reference Number -->
+    <query id="getPaymentIdByRefNo" useConfig="default">
+        <sql>
+            SELECT payment_id FROM policy_payments WHERE reference_no = :reference_no
+        </sql>
+        <param name="reference_no" sqlType="STRING" optional="false"/>
+        <result element="payments" rowName="payment">
+            <element column="payment_id" name="payment_id" xsdType="string"/>
+        </result>
+    </query>
+
+    <!-- Operations-->
+    <operation name="insertPaymentOp">
+        <call-query href="insertPayment">
+            <with-param name="policy_id"      query-param="policy_id"/>
+            <with-param name="customer_id"    query-param="customer_id"/>
+            <with-param name="first_name"     query-param="first_name"/>
+            <with-param name="last_name"      query-param="last_name"/>
+            <with-param name="nic_number"     query-param="nic_number"/>
+            <with-param name="email"          query-param="email"/>
+            <with-param name="mobile_number"  query-param="mobile_number"/>
+            <with-param name="address"        query-param="address"/>
+            <with-param name="amount"         query-param="amount"/>
+            <with-param name="tran_date"      query-param="tran_date"/>
+            <with-param name="payment_method" query-param="payment_method"/>
+            <with-param name="reference_no"   query-param="reference_no"/>
+            <with-param name="status"         query-param="status"/>
+        </call-query>
+    </operation>
+
+    <operation name="getAllPaymentsOp">
+        <call-query href="getAllPayments"/>
+    </operation>
+
+    <operation name="getPaymentsByPolicyIdOp">
+        <call-query href="getPaymentsByPolicyId">
+            <with-param name="policy_id" query-param="policy_id"/>
+        </call-query>
+    </operation>
+
+    <operation name="getPaymentByIdOp">
+        <call-query href="getPaymentById">
+            <with-param name="payment_id" query-param="payment_id"/>
+        </call-query>
+    </operation>
+
+    <operation name="getPaymentIdByRefNoOp">
+        <call-query href="getPaymentIdByRefNo">
+            <with-param name="reference_no" query-param="reference_no"/>
+        </call-query>
+    </operation>
+
+    <!-- REST Resources-->
+    <resource path="payments" method="POST">
+        <call-query href="insertPayment">
+            <with-param name="policy_id"      query-param="policy_id"/>
+            <with-param name="customer_id"    query-param="customer_id"/>
+            <with-param name="first_name"     query-param="first_name"/>
+            <with-param name="last_name"      query-param="last_name"/>
+            <with-param name="nic_number"     query-param="nic_number"/>
+            <with-param name="email"          query-param="email"/>
+            <with-param name="mobile_number"  query-param="mobile_number"/>
+            <with-param name="address"        query-param="address"/>
+            <with-param name="amount"         query-param="amount"/>
+            <with-param name="tran_date"      query-param="tran_date"/>
+            <with-param name="payment_method" query-param="payment_method"/>
+            <with-param name="reference_no"   query-param="reference_no"/>
+            <with-param name="status"         query-param="status"/>
+        </call-query>
+    </resource>
+
+    <resource path="payments" method="GET">
+        <call-query href="getAllPayments"/>
+    </resource>
+
+    <resource path="payments/{policy_id}" method="GET">
+        <call-query href="getPaymentsByPolicyId">
+            <with-param name="policy_id" query-param="policy_id"/>
+        </call-query>
+    </resource>
+
+    <resource path="payments/id/{payment_id}" method="GET">
+        <call-query href="getPaymentById">
+            <with-param name="payment_id" query-param="payment_id"/>
+        </call-query>
+    </resource>
+
+</data>

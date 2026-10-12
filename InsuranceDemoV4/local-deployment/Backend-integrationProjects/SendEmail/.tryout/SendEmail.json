@@ -1,0 +1,57 @@
+{
+  "type": "API",
+  "/submitted": {
+    "requests": [
+      {
+        "name": "SendForSubmitted",
+        "contentType": "application/json",
+        "content": {
+          "from": "email1@gmail.com",
+          "to": "email2@gmail.com",
+          "subject": "Sample email",
+          "content": "This is the body of the sample email",
+          "contentType": "text/plain"
+        },
+        "queryParams": {},
+        "pathParams": {}
+      }
+    ],
+    "defaultRequest": "SendForSubmitted"
+  },
+  "/closed": {
+    "requests": [
+      {
+        "name": "SendEmail",
+        "contentType": "application/json",
+        "content": {
+          "from": "email1@gmail.com",
+          "to": "email2@gmail.com",
+          "subject": "Sample email",
+          "content": "This is the body of the sample email",
+          "contentType": "text/plain"
+        },
+        "queryParams": {},
+        "pathParams": {}
+      }
+    ],
+    "defaultRequest": "SendEmail"
+  },
+  "/send": {
+    "requests": [
+      {
+        "name": "sendEmail",
+        "contentType": "application/json",
+        "content": {
+          "from": "email1@gmail.com",
+          "to": "email2@gmail.com",
+          "subject": "Sample email",
+          "content": "This is the body of the sample email",
+          "contentType": "text/plain"
+        },
+        "queryParams": {},
+        "pathParams": {}
+      }
+    ],
+    "defaultRequest": "sendEmail"
+  }
+}

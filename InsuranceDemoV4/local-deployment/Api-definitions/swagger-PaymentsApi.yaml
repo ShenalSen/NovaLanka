@@ -1,0 +1,339 @@
+openapi: 3.0.1
+info:
+  title: payments-api
+  description: API Definition of payments-api
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8290/payments/v1'
+  - url: 'https://localhost:8253/payments/v1'
+security:
+  - default: []
+paths:
+  /:
+    get:
+      summary: List all payments
+      responses:
+        '200':
+          description: List of payments retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentRecord'
+      security:
+        - default: []
+      x-auth-type: Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    post:
+      summary: Record a new payment
+      requestBody:
+        description: Payment payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      responses:
+        '201':
+          description: Payment recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCreatedResponse'
+        '400':
+          description: Validation error — missing required fields or invalid enum values.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_fields:
+                  value:
+                    error: Validation failed.
+                    message: Missing required fields.
+                invalid_amount:
+                  value:
+                    error: Validation failed.
+                    message: Amount must be a positive number.
+                invalid_payment_method:
+                  value:
+                    error: Validation failed.
+                    message: 'Payment_method must be one of: Cash, Card, Bank Transfer, Online.'
+                invalid_status:
+                  value:
+                    error: Validation failed.
+                    message: 'Status must be one of: Success, Failed, Pending.'
+        '500':
+          description: Internal server error — payment inserted but ID could not be retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/id/{paymentId}':
+    get:
+      summary: Get a payment by payment ID
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment record retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRecord'
+        '404':
+          description: Payment not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/{policyId}':
+    get:
+      summary: Get payments by policy ID
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payments for the given policy.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentRecord'
+        '404':
+          description: No payments found for the given policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - default: []
+      x-auth-type: Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required:
+        - policy_id
+        - amount
+        - tran_date
+        - first_name
+        - last_name
+        - nic_number
+        - email
+        - mobile_number
+        - address
+      properties:
+        policy_id:
+          type: string
+          description: ID of the policy this payment belongs to
+          example: POL_20240130001
+        amount:
+          type: number
+          format: double
+          description: Payment amount — must be a positive number.
+          minimum: 0.01
+          example: 1041.67
+        tran_date:
+          type: string
+          format: date
+          description: Transaction date (YYYY-MM-DD)
+          example: '2024-01-30'
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        nic_number:
+          type: string
+          description: National Identity Card number
+          example: 199012345678
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile_number:
+          type: string
+          example: '+94771234567'
+        address:
+          type: string
+          example: 42 Main Street, Colombo 03
+        payment_method:
+          type: string
+          description: Optional — defaults to Cash if omitted.
+          enum:
+            - Cash
+            - Card
+            - Bank Transfer
+            - Online
+          example: Card
+        status:
+          type: string
+          description: Optional — defaults to Pending if omitted.
+          enum:
+            - Success
+            - Failed
+            - Pending
+          example: Success
+        reference_no:
+          type: string
+          description: Optional external reference number.
+          example: REF_2024013001
+    PaymentCreatedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Payment recorded successfully.
+        payment_id:
+          type: string
+          example: PAY_001
+    PaymentRecord:
+      type: object
+      properties:
+        payment_id:
+          type: string
+          example: PAY_001
+        policy_id:
+          type: string
+          example: POL_20240130001
+        amount:
+          type: number
+          format: double
+          example: 1041.67
+        tran_date:
+          type: string
+          format: date
+          example: '2024-01-30'
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        nic_number:
+          type: string
+          example: 199012345678
+        email:
+          type: string
+          example: john.doe@example.com
+        mobile_number:
+          type: string
+          example: '+94771234567'
+        address:
+          type: string
+          example: 42 Main Street, Colombo 03
+        payment_method:
+          type: string
+          enum:
+            - Cash
+            - Card
+            - Bank Transfer
+            - Online
+        status:
+          type: string
+          enum:
+            - Success
+            - Failed
+            - Pending
+        reference_no:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error category
+        message:
+          type: string
+          description: Human-readable error detail
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://test.com'
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: true
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:8290/payments/v1'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:8290/payments/v1'
+  type: http
+x-wso2-basePath: /payments-api/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

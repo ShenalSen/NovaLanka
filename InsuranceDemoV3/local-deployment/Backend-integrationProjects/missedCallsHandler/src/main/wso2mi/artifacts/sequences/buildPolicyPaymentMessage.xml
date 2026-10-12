@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="buildPolicyPaymentMessage" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Capture required fields from the incoming payload before the dataServiceCall replaces the message body -->
+    <property name="policyId" expression="${payload.policy_id}" scope="default"/>
+    <variable name="nextDueDate" expression="${payload.next_due_date}" type="STRING"/>
+    <!-- Get latest payment for the current policy -->
+    <dataServiceCall serviceName="InsuranceDataBase">
+        <source type="inline"/>
+        <operations type="single">
+            <operation name="getPolicyPayments">
+                <param name="policy_id" expression="get-property('policyId')"/>
+            </operation>
+        </operations>
+        <target type="body"/>
+    </dataServiceCall>
+    <!-- Build the message string based on payment availability -->
+    <filter xpath="${exists(payload.policy_payments.payment)}">
+        <then>
+            <payloadFactory media-type="json">
+                <format>"Your last payment of Rs.${payload.policy_payments.payment.amount} received on ${payload.policy_payments.payment.tran_date} to the contract number ${props.synapse.policyId} and the Next due date is ${vars.nextDueDate}."</format>
+            </payloadFactory>
+        </then>
+        <else>
+            <payloadFactory media-type="json">
+                <format>"No payment details found for policy ${props.synapse.policyId}."</format>
+            </payloadFactory>
+        </else>
+    </filter>
+</sequence>

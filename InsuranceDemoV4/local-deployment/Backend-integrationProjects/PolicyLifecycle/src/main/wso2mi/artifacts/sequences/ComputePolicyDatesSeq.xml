@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="ComputePolicyDatesSeq" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Compute start_date, end_date, next_due_date and policy description -->
+    <script language="js"><![CDATA[
+        var today = new Date();
+        var pad   = function(n) { return n < 10 ? '0' + n : '' + n; };
+        var toDate = function(d) {
+            return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+        };
+
+        // start_date = today
+        var startDate = toDate(today);
+
+        // end_date = today + term_years
+        var endD = new Date(today);
+        endD.setFullYear(endD.getFullYear() + parseInt(mc.getVariable('termYears')));
+        var endDate = toDate(endD);
+
+        // next_due_date = today + period based on frequency
+        var freq = mc.getVariable('frequency');
+        var nextD = new Date(today);
+        if      (freq === 'MONTHLY')     nextD.setDate(nextD.getDate() + 30);
+        else if (freq === 'QUARTERLY')   nextD.setDate(nextD.getDate() + 90);
+        else if (freq === 'SEMI_ANNUAL') nextD.setDate(nextD.getDate() + 180);
+        else                             nextD.setDate(nextD.getDate() + 365); // ANNUAL / default
+
+        var nextDueDate = toDate(nextD);
+
+        // human-readable policy_details string
+        var coverage  = mc.getVariable('coverageType');
+        var termYrs   = mc.getVariable('termYears');
+        var freqLabel = freq.replace('_', '-').toLowerCase();
+        var policyDesc = coverage + ' coverage for ' + termYrs + ' years on a/an ' + freqLabel + ' basis.';
+
+        // tran_date = today
+        var tranDate = startDate;
+
+        mc.setVariable('startDate',   startDate);
+        mc.setVariable('endDate',     endDate);
+        mc.setVariable('nextDueDate', nextDueDate);
+        mc.setVariable('policyDesc',  policyDesc);
+        mc.setVariable('tranDate',    tranDate);
+    ]]></script>
+    <log category="INFO">
+        <message>Computed dates — start: ${vars.startDate}, end: ${vars.endDate}, next_due: ${vars.nextDueDate}</message>
+    </log>
+</sequence>

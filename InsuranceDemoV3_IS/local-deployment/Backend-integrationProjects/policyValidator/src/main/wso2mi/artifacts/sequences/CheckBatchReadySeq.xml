@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="CheckBatchReadySeq" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Query the batch_control table to verify if the data_ready flag is set to 1 -->
+    <dblookup>
+        <connection>
+            <pool>
+                <dsName>insuranceDB</dsName>
+                <property name="validationquery" value=""/>
+            </pool>
+        </connection>
+        <statement>
+            <sql><![CDATA[SELECT data_ready FROM batch_control WHERE job_id = ?]]></sql>
+            <parameter expression="${configs.batch_job_id}" type="VARCHAR"/>
+            <result column="data_ready" name="data_ready"/>
+        </statement>
+    </dblookup>
+    <variable name="dataReady" expression="${properties.synapse.data_ready}" type="STRING"/>
+    <log category="INFO" logMessageID="false" logFullPayload="false">
+        <message>CheckBatchReadySeq: data_ready=${vars.dataReady}</message>
+    </log>
+</sequence>

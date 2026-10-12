@@ -1,0 +1,81 @@
+{
+	"info": {
+		"_postman_id": "8f035977-8ac3-42c5-a726-cadeea6423cd",
+		"name": "Address Verification",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42569940",
+		"_collection_link": "https://no2222-4951.postman.co/workspace/APIM-endpoints-local~edaebae4-98d9-4679-a34f-0a66a381021b/collection/42569940-8f035977-8ac3-42c5-a726-cadeea6423cd?action=share&source=collection_link&creator=42569940"
+	},
+	"item": [
+		{
+			"name": "Valid address",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"address\": \"1600 Pennsylvania Avenue, Washington DC\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/addressverification-api/1.0/address",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"addressverification-api",
+						"1.0",
+						"address"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid address",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"address\": \"Faketown, XYZ\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8243/addressverification-api/1.0/address",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8243",
+					"path": [
+						"addressverification-api",
+						"1.0",
+						"address"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
